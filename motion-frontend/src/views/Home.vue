@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="home-container">
     <section class="home-hero">
       <div class="left-block">
         <div class="headline-art">
@@ -11,7 +11,7 @@
       <div class="right-block">
         <div class="welcome-block">
           <p class="welcome-text">
-            welcome to “motion” — a space where music meets movement, and every step tells a story. with classes for all levels across a variety of styles, we’re here to inspire, challenge, and connect. whether you’re just starting out or mastering your craft, this is where passion and technique come together. step in, move freely, and be part of something bigger.
+            welcome to "motion" — a space where music meets movement, and every step tells a story. with classes for all levels across a variety of styles, we're here to inspire, challenge, and connect. whether you're just starting out or mastering your craft, this is where passion and technique come together. step in, move freely, and be part of something bigger.
           </p>
         </div>
       </div>
@@ -21,79 +21,123 @@
       <div class="about-content">
         <h2>about us</h2>
         <p>
-          “motion” is more than just a studio—it's a community of passionate dancers and teachers. our mission is to provide a welcoming space for everyone to explore, express, and evolve through dance. from hip-hop to contemporary, from beginner to advanced, we have something for everyone.
+          "motion" is more than just a studio—it's a community of passionate dancers and teachers. our mission is to provide a welcoming space for everyone to explore, express, and evolve through dance. from hip-hop to contemporary, from beginner to advanced, we have something for everyone.
         </p>
       </div>
     </section>
 
     <section class="classes-section">
       <h2>our classes</h2>
-      <div class="classes-list">
-        <div class="class-card">
-          <h3>hip-hop</h3>
-          <p>energetic, expressive, and always evolving. all levels welcome.</p>
-        </div>
-        <div class="class-card">
-          <h3>contemporary</h3>
-          <p>fluid movement, emotional storytelling, and creative freedom.</p>
-        </div>
-        <div class="class-card">
-          <h3>breaking</h3>
-          <p>power moves, footwork, and style. learn from the city’s best b-boys and b-girls.</p>
-        </div>
-        <div class="class-card">
-          <h3>kids & teens</h3>
-          <p>fun, safe, and inspiring classes for the next generation of movers.</p>
+      <div v-if="loadingStyles" class="loading-state">
+        loading dance styles...
+      </div>
+      <div v-else class="classes-list">
+        <div v-for="style in styles" :key="style.title" class="class-card">
+          <h3>{{ style.title }}</h3>
+          <p>{{ style.description }}</p>
         </div>
       </div>
     </section>
 
     <section class="crew-section">
       <h2>meet the crew</h2>
-      <div class="crew-list">
-        <div class="crew-member">
-          <img src="https://via.placeholder.com/100" alt="Crew Member 1" />
-          <h4>alex</h4>
-          <p>choreographer & founder</p>
-        </div>
-        <div class="crew-member">
-          <img src="https://via.placeholder.com/100" alt="Crew Member 2" />
-          <h4>jamie</h4>
-          <p>hip-hop & freestyle</p>
-        </div>
-        <div class="crew-member">
-          <img src="https://via.placeholder.com/100" alt="Crew Member 3" />
-          <h4>maria</h4>
-          <p>contemporary & jazz</p>
+      <div v-if="loadingInstructors" class="loading-state">
+        loading instructors...
+      </div>
+      <div v-else class="crew-list">
+        <div v-for="(instructor, index) in instructors" :key="instructor.name" class="crew-member">
+          <img :src="instructor.photo" :alt="instructor.name" />
+          <h4>{{ instructor.name.toLowerCase() }}</h4>
+          <p>{{ getInstructorTitle(index) }}</p>
         </div>
       </div>
     </section>
 
     <section class="cta-section">
       <h2>ready to be in motion?</h2>
-      <button class="cta-btn">sign up for your class</button>
+      <router-link to="/signup" class="cta-btn">sign up for your class</router-link>
     </section>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
-  name: 'Home'
+  name: 'Home',
+  data() {
+    return {
+      instructors: [],
+      styles: [],
+      loadingInstructors: true,
+      loadingStyles: true
+    }
+  },
+  mounted() {
+    this.loadInstructors();
+    this.loadStyles();
+  },
+  methods: {
+    async loadInstructors() {
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/api/instructors');
+      this.instructors = response.data.instructors.slice(0, 3);
+    } catch (error) {
+      console.error('Error loading instructors:', error);
+      this.instructors = [
+        { name: 'alex', photo: 'https://via.placeholder.com/100' },
+        { name: 'jamie', photo: 'https://via.placeholder.com/100' },
+        { name: 'maria', photo: 'https://via.placeholder.com/100' }
+      ];
+    } finally {
+      this.loadingInstructors = false;
+    }
+  },
+
+  getInstructorTitle(index) {
+    const titles = [
+      'commercial',
+      'founder & street dancer',
+      'contemporary artist',
+    ];
+    return titles[index] || 'dance instructor';
+  },
+
+    async loadStyles() {
+        try {
+        const response = await axios.get('http://127.0.0.1:8000/api/styles');
+        this.styles = response.data.styles.slice(0, 3);
+      } catch (error) {
+        console.error('Error loading styles:', error);
+        this.styles = [
+          { title: 'hip-hop', description: 'energetic, expressive, and always evolving. all levels welcome.' },
+          { title: 'contemporary', description: 'fluid movement, emotional storytelling, and creative freedom.' },
+          { title: 'breaking', description: 'power moves, footwork, and style. learn from the city\'s best b-boys and b-girls.' },
+          { title: 'kids & teens', description: 'fun, safe, and inspiring classes for the next generation of movers.' }
+        ];
+      } finally {
+        this.loadingStyles = false;
+      }
+    }
+  }
 }
 </script>
 
 <style scoped>
 
-.home-hero {
-  height: 100vh;
-  width: 100%;
-  background-image:
-    /* linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), */
-    url('/images/homebg.webp');
+.home-container {
+  position: relative;
+  min-height: 100vh;
+  background-image: url('/images/homebg.webp');
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+
+.home-hero {
+  height: 100vh;
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -101,6 +145,13 @@ export default {
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 40px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'NeueHaasDisplay', sans-serif;
 }
 
 .left-block {
@@ -164,11 +215,44 @@ export default {
 }
 
 .about-section {
-  background: #181818;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   color: #ffe18d;
   padding: 80px 0 60px 0;
   display: flex;
   justify-content: center;
+  position: relative;
+}
+
+.classes-section {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #fff;
+  padding: 80px 0 60px 0;
+  text-align: center;
+  position: relative;
+}
+
+.crew-section {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #fff;
+  padding: 80px 0 60px 0;
+  text-align: center;
+  position: relative;
+}
+
+.cta-section {
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff;
+  padding: 80px 0 100px 0;
+  text-align: center;
+  position: relative;
 }
 
 .about-content {
@@ -188,13 +272,6 @@ export default {
   font-size: 1.2rem;
 }
 
-.classes-section {
-  background: #232323;
-  color: #fff;
-  padding: 80px 0 60px 0;
-  text-align: center;
-}
-
 .classes-section h2 {
   font-family: 'NeueHaasDisplayBold', sans-serif;
   font-size: 2rem;
@@ -210,9 +287,9 @@ export default {
 }
 
 .class-card {
-  background: #292929;
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
-  box-shadow: 0 4px 24px #0005;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
   padding: 32px 28px;
   width: 260px;
   min-height: 180px;
@@ -220,45 +297,48 @@ export default {
   flex-direction: column;
   align-items: center;
   transition: box-shadow 0.2s;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 .class-card h3 {
   font-family: 'NeueHaasDisplayBold', sans-serif;
   color: #ffe18d;
   margin-bottom: 0.5rem;
 }
+
 .class-card p {
   font-family: 'NeueHaasDisplayRoman', sans-serif;
   color: #fff;
   font-size: 1.05rem;
 }
 
-.crew-section {
-  background: #181818;
-  color: #fff;
-  padding: 80px 0 60px 0;
-  text-align: center;
-}
 .crew-section h2 {
   font-family: 'NeueHaasDisplayBold', sans-serif;
   font-size: 2rem;
   color: #ffe18d;
   margin-bottom: 2rem;
 }
+
 .crew-list {
   display: flex;
   justify-content: center;
   gap: 40px;
 }
+
 .crew-member {
-  background: #232323;
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 12px;
   padding: 24px 20px;
   width: 180px;
-  box-shadow: 0 4px 24px #0005;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 .crew-member img {
   width: 100px;
   height: 100px;
@@ -267,11 +347,13 @@ export default {
   object-fit: cover;
   background: #111;
 }
+
 .crew-member h4 {
   font-family: 'NeueHaasDisplayBold', sans-serif;
   color: #ffe18d;
   margin: 0.5rem 0 0.2rem 0;
 }
+
 .crew-member p {
   font-family: 'NeueHaasDisplayRoman', sans-serif;
   color: #fff;
@@ -279,38 +361,41 @@ export default {
   margin: 0;
 }
 
-.cta-section {
-  background: linear-gradient(90deg, #ffe18d10 0%, #181818 100%);
-  color: #fff;
-  padding: 80px 0 100px 0;
-  text-align: center;
-}
 .cta-section h2 {
   font-family: 'NeueHaasDisplayBold', sans-serif;
+  color: #fff;
   font-size: 2rem;
-  color: #ffe18d;
   margin-bottom: 2rem;
+  text-shadow:
+    0 0 8px #ffe18d,
+    0 0 20px #ffe18d80;
 }
+
 .cta-btn {
   font-family: 'NeueHaasDisplayBold', sans-serif;
-  background: #ffdc8f;
-  color: #222;
+  background: #ffdc8f9e;
+  color: #ffffff;
   font-size: 1.1rem;
   border: none;
   border-radius: 10px;
   padding: 16px 40px;
   cursor: pointer;
-  box-shadow: 0 0 32px #ffe18d40;
+  text-decoration: none;
+  display: inline-block;
   transition: 
-    background 0.2s,
-    color 0.2s,
-    box-shadow 0.2s;
+    box-shadow 0.3s,
+    background 0.3s,
+    color 0.3s,
+    transform 0.2s cubic-bezier(.4,2,.6,1);
 }
 
 .cta-btn:hover {
-  background: #fff;
-  color: #222;
-  box-shadow: 0 0 48px #ffe18d80;
+  box-shadow: 0 0 32px #ffdc8f9e;
+  transform: scale(1.05);
+}
+
+.cta-btn:active {
+  transform: scale(0.98);
 }
 
 </style>

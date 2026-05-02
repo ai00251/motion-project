@@ -12,17 +12,29 @@
           >
             personal info
           </button>
+          <!-- Only show groups tab for clients -->
           <button 
+            v-if="userRole === 'client'"
             @click="activeTab = 'groups'" 
             :class="['tab-button', { active: activeTab === 'groups' }]"
           >
             groups & contracts
           </button>
+          <!-- Admin tabs -->
           <button 
+            v-if="userRole === 'admin'"
+            @click="activeTab = 'admin-groups'" 
+            :class="['tab-button', { active: activeTab === 'admin-groups' }]"
+          >
+            manage groups
+          </button>
+          <!-- Events tab for non-admins -->
+          <button 
+            v-if="userRole !== 'admin'"
             @click="activeTab = 'events'" 
             :class="['tab-button', { active: activeTab === 'events' }]"
           >
-            my events
+            my classes
           </button>
         </div>
 
@@ -56,6 +68,10 @@
                 <div class="info-row">
                   <span class="info-label">birth date</span>
                   <span class="info-value">{{ formatDate(user.birth_date) }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">role</span>
+                  <span class="info-value">{{ userRole || 'user' }}</span>
                 </div>
               </div>
             </div>
@@ -132,8 +148,8 @@
           </div>
         </div>
 
-        <!-- groups & contracts tab -->
-        <div v-if="activeTab === 'groups'" class="tab-content">
+        <!-- groups & contracts tab - only show for clients -->
+        <div v-if="activeTab === 'groups' && userRole === 'client'" class="tab-content">
           <div class="section-header">
             <h3>my groups & contracts</h3>
             <button class="action-btn primary" @click="loadUserGroups">
@@ -175,10 +191,100 @@
           </div>
         </div>
 
-        <!-- events tab -->
-        <div v-if="activeTab === 'events'" class="tab-content">
+        <!-- Admin Groups Management Tab -->
+        <div v-if="activeTab === 'admin-groups' && userRole === 'admin'" class="tab-content">
           <div class="section-header">
-            <h3>my events</h3>
+            <h3>manage groups</h3>
+            <button class="action-btn primary" @click="showAddGroupForm = true">
+              <i class="fa-solid fa-plus"></i> add new group
+            </button>
+          </div>
+
+          <!-- Add Group Form -->
+          <div v-if="showAddGroupForm" class="form-section">
+            <h4>create new group</h4>
+            <form @submit.prevent="createGroup" class="admin-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>group title</label>
+                  <input 
+                    v-model="newGroup.title" 
+                    type="text" 
+                    class="form-input"
+                    placeholder="e.g., Fresh Moves"
+                    required
+                  >
+                </div>
+                <div class="form-group">
+                  <label>level</label>
+                  <select v-model="newGroup.level" class="form-input" required>
+                    <option value="">select level</option>
+                    <option value="beginner">beginner</option>
+                    <option value="intermediate">intermediate</option>
+                    <option value="advanced">advanced</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label>member count</label>
+                <input 
+                  v-model="newGroup.member_count" 
+                  type="number" 
+                  class="form-input"
+                  min="0"
+                  max="50"
+                  placeholder="0"
+                >
+              </div>
+              
+              <div class="form-actions">
+                <button type="submit" class="action-btn primary" :disabled="loadingCreate">
+                  {{ loadingCreate ? 'creating...' : 'create group' }}
+                </button>
+                <button type="button" class="action-btn secondary" @click="cancelAddGroup">
+                  cancel
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Groups List -->
+          <div v-if="loadingGroups" class="loading-state">
+            loading groups...
+          </div>
+          
+          <div v-else-if="allGroups.length > 0" class="content-grid">
+            <div v-for="group in allGroups" :key="group.group_id" class="content-card">
+              <div class="card-header">
+                <h4>{{ group.title }}</h4>
+                <span class="status-badge" :class="group.level">
+                  {{ group.level }}
+                </span>
+              </div>
+              <div class="card-body">
+                <p><strong>members:</strong> {{ group.member_count || 0 }}</p>
+                <p><strong>created:</strong> {{ formatDate(group.created_at) }}</p>
+              </div>
+              <div class="card-actions">
+                <button class="action-btn small danger" @click="deleteGroup(group.group_id)">
+                  delete
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div v-else class="empty-state">
+            <i class="fa-solid fa-users"></i>
+            <h4>no groups found</h4>
+            <p>start by creating your first dance group.</p>
+          </div>
+        </div>
+
+        <!-- events tab - only for non-admins -->
+        <div v-if="activeTab === 'events' && userRole !== 'admin'" class="tab-content">
+          <div class="section-header">
+            <h3>my classes</h3>
             <button class="action-btn primary" @click="loadUserEvents">
               <i class="fa-solid fa-refresh"></i> refresh
             </button>
@@ -248,35 +354,86 @@ export default {
   data() {
     return {
       user: null,
+      userRole: null,
       editUser: {},
       editMode: false,
       activeTab: 'info',
       loading: false,
       loadingGroups: false,
       loadingEvents: false,
+      loadingCreate: false,
       message: '',
       error: '',
       userGroups: [],
-      userEvents: []
+      userEvents: [],
+      allGroups: [],
+      showAddGroupForm: false,
+      newGroup: {
+        title: '',
+        level: '',
+        member_count: 0
+      }
     }
   },
   mounted() {
     this.loadUserData();
-    this.loadUserGroups();
-    this.loadUserEvents();
+    window.addEventListener('user-role-changed', this.handleRoleChange);
   },
+  beforeUnmount() {
+    window.removeEventListener('user-role-changed', this.handleRoleChange);
+  },
+
   methods: {
+    handleRoleChange(event) {
+      this.user = event.detail.user;
+      this.userRole = event.detail.user.role;
+      
+      if (this.userRole === 'client') {
+        this.loadUserGroups();
+        this.loadUserEvents();
+      } else if (this.userRole === 'admin') {
+        this.loadAllGroups();
+      }
+    },
+
     async loadUserData() {
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        this.user = JSON.parse(userData);
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/api/user', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+            'Accept': 'application/json'
+          }
+        });
+        
+        this.user = response.data.user;
+        this.userRole = response.data.user.role;
         this.editUser = { ...this.user };
-      } else {
-        this.$router.push('/signin');
+        
+        localStorage.setItem('user', JSON.stringify(this.user));
+        
+        if (this.userRole === 'client') {
+          this.loadUserGroups();
+          this.loadUserEvents();
+        } else if (this.userRole === 'admin') {
+          this.loadAllGroups();
+        }
+        
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        const userData = localStorage.getItem('user');
+        if (userData) {
+          this.user = JSON.parse(userData);
+          this.userRole = 'user';
+          this.editUser = { ...this.user };
+        } else {
+          this.$router.push('/signin');
+        }
       }
     },
 
     async loadUserGroups() {
+      if (this.userRole !== 'client') return;
+      
       this.loadingGroups = true;
       try {
         const response = await axios.get('http://127.0.0.1:8000/api/user/groups', {
@@ -312,6 +469,83 @@ export default {
       }
     },
 
+    // Admin Methods
+    async loadAllGroups() {
+      this.loadingGroups = true;
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/api/admin/groups', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+            'Accept': 'application/json'
+          }
+        });
+        this.allGroups = response.data.groups || [];
+      } catch (error) {
+        console.error('error loading groups:', error);
+        this.allGroups = [];
+      } finally {
+        this.loadingGroups = false;
+      }
+    },
+
+    async createGroup() {
+      this.loadingCreate = true;
+      this.error = '';
+      
+      try {
+        const response = await axios.post('http://127.0.0.1:8000/api/admin/groups', this.newGroup, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+
+        this.allGroups.push(response.data.group);
+        this.message = 'Group created successfully!';
+        this.cancelAddGroup();
+        
+        setTimeout(() => {
+          this.message = '';
+        }, 3000);
+
+      } catch (error) {
+        console.error('error creating group:', error);
+        this.error = error.response?.data?.message || 'Failed to create group';
+      } finally {
+        this.loadingCreate = false;
+      }
+    },
+
+    cancelAddGroup() {
+      this.showAddGroupForm = false;
+      this.newGroup = {
+        title: '',
+        level: '',
+        member_count: 0
+      };
+    },
+
+    async deleteGroup(groupId) {
+      if (confirm('Are you sure you want to delete this group?')) {
+        try {
+          await axios.delete(`http://127.0.0.1:8000/api/admin/groups/${groupId}`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+              'Accept': 'application/json'
+            }
+          });
+
+          this.allGroups = this.allGroups.filter(g => g.group_id !== groupId);
+          this.message = 'Group deleted successfully';
+
+        } catch (error) {
+          console.error('error deleting group:', error);
+          this.error = 'Failed to delete group';
+        }
+      }
+    },
+
     startEdit() {
       this.editMode = true;
       this.editUser = { ...this.user };
@@ -331,14 +565,12 @@ export default {
           }
         });
 
-        // update local user data
         this.user = response.data.user;
         localStorage.setItem('user', JSON.stringify(this.user));
         
         this.editMode = false;
         this.message = 'profile updated successfully!';
         
-        // clear message after 3 seconds
         setTimeout(() => {
           this.message = '';
         }, 3000);
@@ -374,7 +606,6 @@ export default {
           }
         );
 
-        // update local event status
         const event = this.userEvents.find(e => e.id === eventId);
         if (event) {
           event.attendance_status = status;
@@ -401,7 +632,6 @@ export default {
             }
           });
 
-          // remove group from local array
           this.userGroups = this.userGroups.filter(g => g.id !== groupId);
           this.message = 'successfully left the group';
 
@@ -428,7 +658,7 @@ export default {
 </script>
 
 <style scoped>
-/* base page styling */
+
 .profile-page {
   position: relative;
   min-height: 100vh;
@@ -491,11 +721,13 @@ export default {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
   padding: 5px;
+  flex-wrap: wrap;
 }
 
 .tab-button {
   font-family: 'NeueHaasDisplay', sans-serif;
   flex: 1;
+  min-width: 120px;
   padding: 12px 20px;
   background: none;
   border: none;
@@ -503,7 +735,8 @@ export default {
   cursor: pointer;
   border-radius: 8px;
   transition: all 0.3s;
-  font-size: 16px;
+  font-size: 14px;
+  text-align: center;
 }
 
 .tab-button.active {
@@ -552,6 +785,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .section-header h3 {
@@ -560,6 +795,35 @@ export default {
   font-size: 24px;
   margin: 0;
   text-shadow: 0 0 8px #ffe18d;
+}
+
+/* form sections */
+.form-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 30px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-section h4 {
+  font-family: 'NeueHaasDisplayBold', sans-serif;
+  color: #fff;
+  font-size: 20px;
+  margin: 0 0 20px 0;
+  text-shadow: 0 0 8px #ffe18d;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.admin-form textarea {
+  resize: vertical;
+  min-height: 80px;
 }
 
 /* info display */
@@ -635,6 +899,12 @@ export default {
   gap: 20px;
 }
 
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -673,6 +943,7 @@ export default {
   display: flex;
   gap: 15px;
   margin-top: 20px;
+  flex-wrap: wrap;
 }
 
 /* content grid */
@@ -729,6 +1000,21 @@ export default {
 }
 
 .status-badge.cancelled {
+  background: rgba(244, 67, 54, 0.3);
+  color: #f44336;
+}
+
+.status-badge.beginner {
+  background: rgba(76, 175, 80, 0.3);
+  color: #4CAF50;
+}
+
+.status-badge.intermediate {
+  background: rgba(255, 193, 7, 0.3);
+  color: #FFC107;
+}
+
+.status-badge.advanced {
   background: rgba(244, 67, 54, 0.3);
   color: #f44336;
 }
@@ -856,7 +1142,6 @@ export default {
   margin-bottom: 30px;
 }
 
-/* loading states */
 .loading-state {
   text-align: center;
   padding: 40px;
@@ -864,10 +1149,10 @@ export default {
   font-family: 'NeueHaasDisplay', sans-serif;
 }
 
-/* logout section */
 .logout-section {
   margin-top: 40px;
   padding-top: 30px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 </style>

@@ -111,32 +111,56 @@ class AuthController extends Controller
     
     public function forgotPassword(Request $request)
     {
-        \Log::info('=== FORGOT PASSWORD REQUEST START ===');
-        \Log::info('Email requested: ' . $request->email);
-        
         $request->validate([
             'email' => 'required|email|exists:users,email'
         ]);
-        
-        \Log::info('Validation passed for email: ' . $request->email);
-        
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-        
-        \Log::info('Password reset status: ' . $status);
-        \Log::info('=== FORGOT PASSWORD REQUEST END ===');
 
-        if ($status === Password::RESET_LINK_SENT) {
+        $user = User::where('email', $request->email)->first();
+        
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found.'
+            ], 404);
+        }
+
+        // Generate a simple reset token
+        $token = \Str::random(60);
+        
+        // Store the token in password_reset_tokens table
+        \DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'token' => Hash::make($token),
+                'created_at' => now()
+            ]
+        );
+
+        // Create the frontend reset URL instead of API URL
+        $resetUrl = "http://localhost:3000/reset-password?token={$token}&email=" . urlencode($request->email);
+
+        // Send email with the frontend URL
+        try {
+            Mail::send('emails.password-reset', [
+                'resetUrl' => $resetUrl,
+                'email' => $request->email
+            ], function($message) use ($request) {
+                $message->to($request->email);
+                $message->subject('Reset Your Password - Motion Dance Company');
+            });
+
             return response()->json([
                 'message' => 'Password reset link sent to your email.'
             ], 200);
+            
+        } catch (\Exception $e) {
+            \Log::error('Failed to send password reset email: ' . $e->getMessage());
+            
+            return response()->json([
+                'message' => 'Failed to send email. Please try again later.'
+            ], 500);
         }
-
-        return response()->json([
-            'message' => 'Unable to send reset link. Please try again.'
-        ], 400);
     }
+
 
     public function resetPassword(Request $request)
     {

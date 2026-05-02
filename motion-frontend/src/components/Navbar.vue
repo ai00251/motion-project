@@ -7,8 +7,8 @@
     />
     <div class="nav-links">
       <router-link to="/" class="nav-link">home</router-link>
-      <a href="#" class="nav-link">groups</a>
-      <a href="#" class="nav-link">crew</a>
+      <router-link to="/groups" class="nav-link">groups</router-link>
+      <router-link to="/crew" class="nav-link">crew</router-link>
       <a href="#" class="nav-link">classes</a>
 
       <router-link 

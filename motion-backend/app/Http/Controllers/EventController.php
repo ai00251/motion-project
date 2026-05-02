@@ -17,6 +17,27 @@ class EventController extends Controller
         ]);
     }
 
+    public function show($id)
+    {
+        $event = Event::with('style')->findOrFail($id);
+        
+        return response()->json([
+            'event' => [
+                'id' => $event->event_id,
+                'title' => $event->style->title ?? 'dance class',
+                'description' => $event->style->description ?? '',
+                'level' => $event->level,
+                'duration' => $event->duration_minutes . ' minutes',
+                'hall' => ucfirst(str_replace('_', ' ', $event->hall)),
+                'start_date' => $event->start_date,
+                'start_time' => $event->start_time,
+                'capacity' => $event->capacity,
+                'registered_count' => $event->registrations()->count()
+            ],
+            'message' => 'event retrieved successfully'
+        ]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
