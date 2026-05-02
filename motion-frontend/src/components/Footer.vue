@@ -9,24 +9,21 @@
         </div>
       </div>
       <div class="footer-col">
-        <h4>contact information</h4>
+        <h4>kontaktinformācija</h4>
         <p>motion@rvt.lv</p>
         <p>+371 2039 7700</p>
       </div>
       <div class="footer-col">
-        <h4>address / location</h4>
-        <p>krišjāņa valdemāra iela 1c,<br>centra rajons, riga, lv-1010</p>
-        <h4 style="margin-top:1em;">working hours</h4>
-        <p>mon - fri 14:00–20:00<br>sat - sun 15:00–18:00</p>
+        <h4>adrese / atrašanās vieta</h4>
+        <p>krišjāņa valdemāra iela 1c,<br>centra rajons, rīga, lv-1010</p>
+        <h4 style="margin-top:1em;">darba laiks</h4>
+        <p>pirmd. - piektd. 14:00–20:00<br>sestd. - svētd. 15:00–18:00</p>
       </div>
       <div class="footer-col">
-        <h4>useful links</h4>
-        <a href="#" class="footer-link">faqs</a>
-        <a href="#" class="footer-link">privacy & terms</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>&copy; {{ new Date().getFullYear() }} motion. all rights reserved.</span>
+      <span>&copy; {{ new Date().getFullYear() }} motion. visas tiesības aizsargātas.</span>
     </div>
   </footer>
 </template>

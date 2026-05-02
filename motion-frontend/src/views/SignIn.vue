@@ -1,7 +1,7 @@
 <template>
   <div class="signin-page">
     <div class="signin-container">
-      <h2 class="signin-title">log in</h2>
+      <h2 class="signin-title">pieslēgties</h2>
       
       <div v-if="message" class="success-message">
         {{ message }}
@@ -15,29 +15,29 @@
         <input 
           v-model="email"
           type="email" 
-          placeholder="e-mail" 
+          placeholder="e-pasts" 
           class="signin-input"
           required
         >
         <input 
           v-model="password"
           type="password" 
-          placeholder="password" 
+          placeholder="parole" 
           class="signin-input"
           required
         >
         <button type="submit" class="signin-button" :disabled="loading">
-          {{ loading ? 'logging in...' : 'log in' }}
+          {{ loading ? 'pieslēdzas...' : 'pieslēgties' }}
         </button>
       </form>
       
       <p class="forgot-password-text">
-        <router-link to="/forgot-password" class="forgot-password-link">forgot password?</router-link>
+        <router-link to="/forgot-password" class="forgot-password-link">aizmirsi paroli?</router-link>
       </p>
       
       <p class="signup-text">
-        don't have an account? 
-        <router-link to="/signup" class="signup-link">sign up!</router-link>
+        tev vēl nav konta? 
+        <router-link to="/signup" class="signup-link">reģistrēties!</router-link>
       </p>
     </div>
   </div>
@@ -63,7 +63,7 @@ export default {
       this.message = '';
       this.error = '';
       
-      console.log('Making login API call...');
+      console.log('Veicu pieslēgšanās API pieprasījumu...');
       
       try {
         const response = await axios.post('http://127.0.0.1:8000/api/login', {
@@ -76,7 +76,7 @@ export default {
           }
         });
         
-        console.log('Login success:', response.data);
+        console.log('Pieslēgšanās veiksmīga:', response.data);
         
         localStorage.setItem('auth_token', response.data.token);
         
@@ -84,18 +84,18 @@ export default {
         
         window.dispatchEvent(new CustomEvent('auth-changed'));
         
-        this.message = 'Login successful! Redirecting...';
+        this.message = 'Pieslēgšanās veiksmīga! Novirza...';
         
         setTimeout(() => {
           this.$router.push('/');
         }, 1000);
         
       } catch (error) {
-        console.error('Login error:', error);
+        console.error('Pieslēgšanās kļūda:', error);
         if (error.response && error.response.data) {
-          this.error = error.response.data.message || 'Login failed';
+          this.error = error.response.data.message || 'Pieslēgties neizdevās';
         } else {
-          this.error = 'Network error. Please try again.';
+          this.error = 'Tīkla kļūda. Lūdzu, mēģini vēlreiz.';
         }
       } finally {
         this.loading = false;

@@ -1,7 +1,7 @@
 <template>
   <div class="signup-page">
     <div class="signup-container">
-      <h2 class="signup-title">sign up</h2>
+      <h2 class="signup-title">reģistrēties</h2>
       <form class="signup-form" @submit.prevent="handleSignUp">
         <!-- Show validation errors -->
         <div v-if="Object.keys(errors).length > 0" class="error-messages">
@@ -12,7 +12,7 @@
 
         <input 
           type="text" 
-          placeholder="name" 
+          placeholder="vārds" 
           class="signup-input"
           v-model="form.name"
           :class="{ 'error': errors.name }"
@@ -20,7 +20,7 @@
         >
         <input 
           type="text" 
-          placeholder="last name" 
+          placeholder="uzvārds" 
           class="signup-input"
           v-model="form.surname"
           :class="{ 'error': errors.surname }"
@@ -28,7 +28,7 @@
         >
         <input 
           type="date" 
-          placeholder="birth date" 
+          placeholder="dzimšanas datums" 
           class="signup-input"
           v-model="form.birth_date"
           :class="{ 'error': errors.birth_date }"
@@ -36,7 +36,7 @@
         >
         <input 
           type="tel" 
-          placeholder="phone" 
+          placeholder="tālrunis" 
           class="signup-input"
           v-model="form.phone_number"
           :class="{ 'error': errors.phone_number }"
@@ -44,7 +44,7 @@
         >
         <input 
           type="email" 
-          placeholder="e-mail" 
+          placeholder="e-pasts" 
           class="signup-input"
           v-model="form.email"
           :class="{ 'error': errors.email }"
@@ -52,7 +52,7 @@
         >
         <input 
           type="password" 
-          placeholder="password" 
+          placeholder="parole" 
           class="signup-input"
           v-model="form.password"
           :class="{ 'error': errors.password }"
@@ -60,14 +60,14 @@
         >
         <input 
           type="password" 
-          placeholder="confirm password" 
+          placeholder="apstiprini paroli" 
           class="signup-input"
           v-model="form.password_confirmation"
           :class="{ 'error': errors.password_confirmation || passwordMismatch }"
           required
         >
         <div v-if="passwordMismatch" class="error-message" style="margin-top: -15px;">
-          Passwords do not match
+          Paroles nesakrīt
         </div>
 
         <button 
@@ -75,12 +75,12 @@
           class="signup-button"
           :disabled="loading || passwordMismatch"
         >
-          {{ loading ? 'signing up...' : 'sign up' }}
+          {{ loading ? 'reģistrē...' : 'reģistrēties' }}
         </button>
       </form>
       <p class="signin-text">
-        already have an account? 
-        <router-link to="/signin" class="signin-link">log in!</router-link>
+        tev jau ir konts? 
+        <router-link to="/signin" class="signin-link">pieslēdzies</router-link>
       </p>
     </div>
   </div>
@@ -124,18 +124,18 @@ export default {
       try {
         const response = await auth.register(this.form)
         
-        console.log('Registration successful:', response)
-        alert('Registration successful! Welcome to Motion!')
+        console.log('Reģistrācija veiksmīga:', response)
+        alert('Reģistrācija veiksmīga! Laipni lūgts Motion!')
         
         this.$router.push('/')
         
       } catch (error) {
-        console.error('Registration error:', error)
+        console.error('Reģistrācijas kļūda:', error)
         
         if (error.response && error.response.status === 422) {
           this.errors = error.response.data.errors
         } else {
-          alert('Registration failed. Please try again.')
+          alert('Reģistrācija neizdevās. Lūdzu, mēģini vēlreiz.')
         }
       } finally {
         this.loading = false

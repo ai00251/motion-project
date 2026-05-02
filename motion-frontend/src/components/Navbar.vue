@@ -6,17 +6,17 @@
       class="logo"
     />
     <div class="nav-links">
-      <router-link to="/" class="nav-link">home</router-link>
-      <router-link to="/groups" class="nav-link">groups</router-link>
-      <router-link to="/crew" class="nav-link">crew</router-link>
-      <a href="#" class="nav-link">classes</a>
+      <router-link to="/" class="nav-link">sākums</router-link>
+      <router-link to="/groups" class="nav-link">grupas</router-link>
+      <router-link to="/crew" class="nav-link">komanda</router-link>
+      <a href="#" class="nav-link">nodarbības</a>
 
       <router-link 
         v-if="!isLoggedIn" 
         to="/signin" 
         class="nav-link sign-in-button"
       >
-        sign in
+        pieslēgties
       </router-link>
       
       <router-link 

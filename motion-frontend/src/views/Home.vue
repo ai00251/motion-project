@@ -3,15 +3,15 @@
     <section class="home-hero">
       <div class="left-block">
         <div class="headline-art">
-          <span class="united-by">united by</span>
+          <span class="united-by">vienoti</span>
           <br />
-          <span class="motion">MOTION</span>
+          <span class="motion">kustībā</span>
         </div>
       </div>
       <div class="right-block">
         <div class="welcome-block">
           <p class="welcome-text">
-            welcome to "motion" — a space where music meets movement, and every step tells a story. with classes for all levels across a variety of styles, we're here to inspire, challenge, and connect. whether you're just starting out or mastering your craft, this is where passion and technique come together. step in, move freely, and be part of something bigger.
+            laipni lūgts "motion" — vietā, kur mūzika satiekas ar kustību un katrs solis izstāsta savu stāstu. mēs piedāvājam nodarbības visiem līmeņiem dažādos deju stilos, lai iedvesmotu, izaicinātu un vienotu. neatkarīgi no tā, vai tu tikai sāc vai jau pilnveido savu meistarību, šī ir vieta, kur satiekas aizrautība un tehnika. nāc iekšā, kusties brīvi un kļūsti par daļu no kā lielāka.
           </p>
         </div>
       </div>
@@ -19,17 +19,17 @@
 
     <section class="about-section">
       <div class="about-content">
-        <h2>about us</h2>
+        <h2>par mums</h2>
         <p>
-          "motion" is more than just a studio—it's a community of passionate dancers and teachers. our mission is to provide a welcoming space for everyone to explore, express, and evolve through dance. from hip-hop to contemporary, from beginner to advanced, we have something for everyone.
+          "motion" ir vairāk nekā tikai studija — tā ir aizrautīgu dejotāju un pasniedzēju kopiena. mūsu misija ir radīt atvērtu un iedvesmojošu vidi, kur ikviens var izzināt, izpausties un attīstīties caur deju. no hiphopa līdz laikmetīgajai dejai, no iesācēju līdz augstākam līmenim — pie mums ir vieta ikvienam.
         </p>
       </div>
     </section>
 
     <section class="classes-section">
-      <h2>our classes</h2>
+      <h2>mūsu nodarbības</h2>
       <div v-if="loadingStyles" class="loading-state">
-        loading dance styles...
+        ielādē deju stilus...
       </div>
       <div v-else class="classes-list">
         <div v-for="style in styles" :key="style.title" class="class-card">
@@ -40,9 +40,9 @@
     </section>
 
     <section class="crew-section">
-      <h2>meet the crew</h2>
+      <h2>iepazīsti komandu</h2>
       <div v-if="loadingInstructors" class="loading-state">
-        loading instructors...
+        ielādē pasniedzējus...
       </div>
       <div v-else class="crew-list">
         <div v-for="(instructor, index) in instructors" :key="instructor.name" class="crew-member">
@@ -54,8 +54,8 @@
     </section>
 
     <section class="cta-section">
-      <h2>ready to be in motion?</h2>
-      <router-link to="/signup" class="cta-btn">sign up for your class</router-link>
+      <h2>gatavs būt kustībā?</h2>
+      <router-link to="/signup" class="cta-btn">pieraksties savai nodarbībai</router-link>
     </section>
   </div>
 </template>
@@ -79,41 +79,41 @@ export default {
   },
   methods: {
     async loadInstructors() {
-    try {
-      const response = await axios.get('http://127.0.0.1:8000/api/instructors');
-      this.instructors = response.data.instructors.slice(0, 3);
-    } catch (error) {
-      console.error('Error loading instructors:', error);
-      this.instructors = [
-        { name: 'alex', photo: 'https://via.placeholder.com/100' },
-        { name: 'jamie', photo: 'https://via.placeholder.com/100' },
-        { name: 'maria', photo: 'https://via.placeholder.com/100' }
-      ];
-    } finally {
-      this.loadingInstructors = false;
-    }
-  },
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/api/instructors');
+        this.instructors = response.data.instructors.slice(0, 3);
+      } catch (error) {
+        console.error('Kļūda, ielādējot pasniedzējus:', error);
+        this.instructors = [
+          { name: 'alex', photo: 'https://via.placeholder.com/100' },
+          { name: 'jamie', photo: 'https://via.placeholder.com/100' },
+          { name: 'maria', photo: 'https://via.placeholder.com/100' }
+        ];
+      } finally {
+        this.loadingInstructors = false;
+      }
+    },
 
-  getInstructorTitle(index) {
-    const titles = [
-      'commercial',
-      'founder & street dancer',
-      'contemporary artist',
-    ];
-    return titles[index] || 'dance instructor';
-  },
+    getInstructorTitle(index) {
+      const titles = [
+        'komerciālā deja',
+        'dibinātājs un ielu dejotājs',
+        'laikmetīgās dejas māksliniece',
+      ];
+      return titles[index] || 'deju pasniedzējs';
+    },
 
     async loadStyles() {
-        try {
+      try {
         const response = await axios.get('http://127.0.0.1:8000/api/styles');
         this.styles = response.data.styles.slice(0, 3);
       } catch (error) {
-        console.error('Error loading styles:', error);
+        console.error('Kļūda, ielādējot deju stilus:', error);
         this.styles = [
-          { title: 'hip-hop', description: 'energetic, expressive, and always evolving. all levels welcome.' },
-          { title: 'contemporary', description: 'fluid movement, emotional storytelling, and creative freedom.' },
-          { title: 'breaking', description: 'power moves, footwork, and style. learn from the city\'s best b-boys and b-girls.' },
-          { title: 'kids & teens', description: 'fun, safe, and inspiring classes for the next generation of movers.' }
+          { title: 'hip-hop', description: 'enerģisks, izteiksmīgs un vienmēr attīstībā. gaidīts ikviens līmenis.' },
+          { title: 'contemporary', description: 'plūstoša kustība, emocionāls stāstījums un radoša brīvība.' },
+          { title: 'breaking', description: 'spēka elementi, footwork un stils. mācies no pilsētas labākajiem b-boy un b-girl dejotājiem.' },
+          { title: 'kids & teens', description: 'jautras, drošas un iedvesmojošas nodarbības jaunajai kustību paaudzei.' }
         ];
       } finally {
         this.loadingStyles = false;

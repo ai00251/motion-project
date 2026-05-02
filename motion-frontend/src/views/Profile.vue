@@ -1,7 +1,7 @@
 <template>
   <div class="profile-page">
     <div class="profile-container">
-      <h2 class="profile-title">my profile</h2>
+      <h2 class="profile-title">mans profils</h2>
       
       <div v-if="user" class="profile-content">
         <!-- navigation tabs -->
@@ -10,7 +10,7 @@
             @click="activeTab = 'info'" 
             :class="['tab-button', { active: activeTab === 'info' }]"
           >
-            personal info
+            personīgā informācija
           </button>
           <!-- Only show groups tab for clients -->
           <button 
@@ -18,7 +18,7 @@
             @click="activeTab = 'groups'" 
             :class="['tab-button', { active: activeTab === 'groups' }]"
           >
-            groups & contracts
+            grupas un līgumi
           </button>
           <!-- Admin tabs -->
           <button 
@@ -26,7 +26,7 @@
             @click="activeTab = 'admin-groups'" 
             :class="['tab-button', { active: activeTab === 'admin-groups' }]"
           >
-            manage groups
+            pārvaldīt grupas
           </button>
           <!-- Events tab for non-admins -->
           <button 
@@ -34,7 +34,7 @@
             @click="activeTab = 'events'" 
             :class="['tab-button', { active: activeTab === 'events' }]"
           >
-            my classes
+            manas nodarbības
           </button>
         </div>
 
@@ -52,42 +52,42 @@
           <div v-if="!editMode" class="info-display">
             <div class="info-grid">
               <div class="info-card">
-                <h3>basic information</h3>
+                <h3>pamatinformācija</h3>
                 <div class="info-row">
-                  <span class="info-label">full name</span>
+                  <span class="info-label">pilns vārds</span>
                   <span class="info-value">{{ user.name }} {{ user.surname }}</span>
                 </div>
                 <div class="info-row">
-                  <span class="info-label">email</span>
+                  <span class="info-label">e-pasts</span>
                   <span class="info-value">{{ user.email }}</span>
                 </div>
                 <div class="info-row">
-                  <span class="info-label">phone</span>
+                  <span class="info-label">tālrunis</span>
                   <span class="info-value">{{ user.phone_number }}</span>
                 </div>
                 <div class="info-row">
-                  <span class="info-label">birth date</span>
+                  <span class="info-label">dzimšanas datums</span>
                   <span class="info-value">{{ formatDate(user.birth_date) }}</span>
                 </div>
                 <div class="info-row">
-                  <span class="info-label">role</span>
-                  <span class="info-value">{{ userRole || 'user' }}</span>
+                  <span class="info-label">loma</span>
+                  <span class="info-value">{{ userRole || 'lietotājs' }}</span>
                 </div>
               </div>
             </div>
             
             <button class="action-btn primary" @click="startEdit">
-              <i class="fa-solid fa-edit"></i> edit profile
+              <i class="fa-solid fa-edit"></i> rediģēt profilu
             </button>
           </div>
 
           <!-- edit form -->
           <div v-if="editMode" class="edit-section">
-            <h3>edit personal information</h3>
+            <h3>rediģēt personīgo informāciju</h3>
             <form @submit.prevent="saveProfile" class="edit-form">
               <div class="form-row">
                 <div class="form-group">
-                  <label>first name</label>
+                  <label>vārds</label>
                   <input 
                     v-model="editUser.name" 
                     type="text" 
@@ -96,7 +96,7 @@
                   >
                 </div>
                 <div class="form-group">
-                  <label>last name</label>
+                  <label>uzvārds</label>
                   <input 
                     v-model="editUser.surname" 
                     type="text" 
@@ -107,7 +107,7 @@
               </div>
               
               <div class="form-group">
-                <label>email</label>
+                <label>e-pasts</label>
                 <input 
                   v-model="editUser.email" 
                   type="email" 
@@ -117,7 +117,7 @@
               </div>
               
               <div class="form-group">
-                <label>phone number</label>
+                <label>tālruņa numurs</label>
                 <input 
                   v-model="editUser.phone_number" 
                   type="text" 
@@ -127,7 +127,7 @@
               </div>
               
               <div class="form-group">
-                <label>birth date</label>
+                <label>dzimšanas datums</label>
                 <input 
                   v-model="editUser.birth_date" 
                   type="date" 
@@ -138,10 +138,10 @@
               
               <div class="form-actions">
                 <button type="submit" class="action-btn primary" :disabled="loading">
-                  {{ loading ? 'saving...' : 'save changes' }}
+                  {{ loading ? 'saglabā...' : 'saglabāt izmaiņas' }}
                 </button>
                 <button type="button" class="action-btn secondary" @click="cancelEdit">
-                  cancel
+                  atcelt
                 </button>
               </div>
             </form>
@@ -151,14 +151,14 @@
         <!-- groups & contracts tab - only show for clients -->
         <div v-if="activeTab === 'groups' && userRole === 'client'" class="tab-content">
           <div class="section-header">
-            <h3>my groups & contracts</h3>
+            <h3>manas grupas un līgumi</h3>
             <button class="action-btn primary" @click="loadUserGroups">
-              <i class="fa-solid fa-refresh"></i> refresh
+              <i class="fa-solid fa-refresh"></i> atjaunot
             </button>
           </div>
           
           <div v-if="loadingGroups" class="loading-state">
-            loading groups...
+            ielādē grupas...
           </div>
           
           <div v-else-if="userGroups.length > 0" class="content-grid">
@@ -170,14 +170,14 @@
                 </span>
               </div>
               <div class="card-body">
-                <p><strong>type:</strong> {{ group.type }}</p>
-                <p><strong>joined:</strong> {{ formatDate(group.joined_date) }}</p>
-                <p><strong>role:</strong> {{ group.role }}</p>
+                <p><strong>tips:</strong> {{ group.type }}</p>
+                <p><strong>pievienojās:</strong> {{ formatDate(group.joined_date) }}</p>
+                <p><strong>loma:</strong> {{ group.role }}</p>
               </div>
               <div class="card-actions">
-                <button class="action-btn small">view details</button>
+                <button class="action-btn small">skatīt detaļas</button>
                 <button class="action-btn small danger" @click="leaveGroup(group.id)">
-                  leave group
+                  pamest grupu
                 </button>
               </div>
             </div>
@@ -185,49 +185,49 @@
           
           <div v-else class="empty-state">
             <i class="fa-solid fa-users"></i>
-            <h4>no groups found</h4>
-            <p>you're not currently part of any dance groups or contracts.</p>
-            <button class="action-btn primary">explore groups</button>
+            <h4>grupas nav atrastas</h4>
+            <p>tu pašlaik neesi nevienā deju grupā vai līgumā.</p>
+            <button class="action-btn primary">apskatīt grupas</button>
           </div>
         </div>
 
         <!-- Admin Groups Management Tab -->
         <div v-if="activeTab === 'admin-groups' && userRole === 'admin'" class="tab-content">
           <div class="section-header">
-            <h3>manage groups</h3>
+            <h3>pārvaldīt grupas</h3>
             <button class="action-btn primary" @click="showAddGroupForm = true">
-              <i class="fa-solid fa-plus"></i> add new group
+              <i class="fa-solid fa-plus"></i> pievienot jaunu grupu
             </button>
           </div>
 
           <!-- Add Group Form -->
           <div v-if="showAddGroupForm" class="form-section">
-            <h4>create new group</h4>
+            <h4>izveidot jaunu grupu</h4>
             <form @submit.prevent="createGroup" class="admin-form">
               <div class="form-row">
                 <div class="form-group">
-                  <label>group title</label>
+                  <label>grupas nosaukums</label>
                   <input 
                     v-model="newGroup.title" 
                     type="text" 
                     class="form-input"
-                    placeholder="e.g., Fresh Moves"
+                    placeholder="piem., Fresh Moves"
                     required
                   >
                 </div>
                 <div class="form-group">
-                  <label>level</label>
+                  <label>līmenis</label>
                   <select v-model="newGroup.level" class="form-input" required>
-                    <option value="">select level</option>
-                    <option value="beginner">beginner</option>
-                    <option value="intermediate">intermediate</option>
-                    <option value="advanced">advanced</option>
+                    <option value="">izvēlies līmeni</option>
+                    <option value="beginner">iesācēju</option>
+                    <option value="intermediate">vidējs</option>
+                    <option value="advanced">augstāks</option>
                   </select>
                 </div>
               </div>
               
               <div class="form-group">
-                <label>member count</label>
+                <label>dalībnieku skaits</label>
                 <input 
                   v-model="newGroup.member_count" 
                   type="number" 
@@ -240,10 +240,10 @@
               
               <div class="form-actions">
                 <button type="submit" class="action-btn primary" :disabled="loadingCreate">
-                  {{ loadingCreate ? 'creating...' : 'create group' }}
+                  {{ loadingCreate ? 'veido...' : 'izveidot grupu' }}
                 </button>
                 <button type="button" class="action-btn secondary" @click="cancelAddGroup">
-                  cancel
+                  atcelt
                 </button>
               </div>
             </form>
@@ -251,7 +251,7 @@
 
           <!-- Groups List -->
           <div v-if="loadingGroups" class="loading-state">
-            loading groups...
+            ielādē grupas...
           </div>
           
           <div v-else-if="allGroups.length > 0" class="content-grid">
@@ -263,12 +263,12 @@
                 </span>
               </div>
               <div class="card-body">
-                <p><strong>members:</strong> {{ group.member_count || 0 }}</p>
-                <p><strong>created:</strong> {{ formatDate(group.created_at) }}</p>
+                <p><strong>dalībnieki:</strong> {{ group.member_count || 0 }}</p>
+                <p><strong>izveidots:</strong> {{ formatDate(group.created_at) }}</p>
               </div>
               <div class="card-actions">
                 <button class="action-btn small danger" @click="deleteGroup(group.group_id)">
-                  delete
+                  dzēst
                 </button>
               </div>
             </div>
@@ -276,22 +276,22 @@
           
           <div v-else class="empty-state">
             <i class="fa-solid fa-users"></i>
-            <h4>no groups found</h4>
-            <p>start by creating your first dance group.</p>
+            <h4>grupas nav atrastas</h4>
+            <p>sāc, izveidojot savu pirmo deju grupu.</p>
           </div>
         </div>
 
         <!-- events tab - only for non-admins -->
         <div v-if="activeTab === 'events' && userRole !== 'admin'" class="tab-content">
           <div class="section-header">
-            <h3>my classes</h3>
+            <h3>manas nodarbības</h3>
             <button class="action-btn primary" @click="loadUserEvents">
-              <i class="fa-solid fa-refresh"></i> refresh
+              <i class="fa-solid fa-refresh"></i> atjaunot
             </button>
           </div>
           
           <div v-if="loadingEvents" class="loading-state">
-            loading events...
+            ielādē nodarbības...
           </div>
           
           <div v-else-if="userEvents.length > 0" class="content-grid">
@@ -306,7 +306,7 @@
                 <p><i class="fa-solid fa-calendar"></i> {{ formatDate(event.date) }}</p>
                 <p><i class="fa-solid fa-clock"></i> {{ event.time }}</p>
                 <p><i class="fa-solid fa-location-dot"></i> {{ event.location }}</p>
-                <p><strong>description:</strong> {{ event.description }}</p>
+                <p><strong>apraksts:</strong> {{ event.description }}</p>
               </div>
               <div class="card-actions">
                 <button 
@@ -314,14 +314,14 @@
                   class="action-btn small primary"
                   @click="updateEventStatus(event.id, 'confirmed')"
                 >
-                  confirm
+                  apstiprināt
                 </button>
                 <button 
                   v-if="event.attendance_status !== 'cancelled'" 
                   class="action-btn small danger"
                   @click="updateEventStatus(event.id, 'cancelled')"
                 >
-                  cancel
+                  atcelt
                 </button>
               </div>
             </div>
@@ -329,16 +329,16 @@
           
           <div v-else class="empty-state">
             <i class="fa-solid fa-calendar-xmark"></i>
-            <h4>no events found</h4>
-            <p>you have no upcoming events scheduled.</p>
-            <button class="action-btn primary">browse events</button>
+            <h4>nodarbības nav atrastas</h4>
+            <p>tev nav ieplānotu gaidāmo nodarbību.</p>
+            <button class="action-btn primary">apskatīt nodarbības</button>
           </div>
         </div>
 
         <!-- logout section -->
         <div class="logout-section">
           <button class="action-btn danger full-width" @click="logout">
-            <i class="fa-solid fa-right-from-bracket"></i> logout
+            <i class="fa-solid fa-right-from-bracket"></i> izrakstīties
           </button>
         </div>
       </div>
@@ -419,7 +419,7 @@ export default {
         }
         
       } catch (error) {
-        console.error('Error loading user data:', error);
+        console.error('Kļūda, ielādējot lietotāja datus:', error);
         const userData = localStorage.getItem('user');
         if (userData) {
           this.user = JSON.parse(userData);
@@ -444,7 +444,7 @@ export default {
         });
         this.userGroups = response.data.groups || [];
       } catch (error) {
-        console.error('error loading groups:', error);
+        console.error('Kļūda, ielādējot grupas:', error);
         this.userGroups = [];
       } finally {
         this.loadingGroups = false;
@@ -462,7 +462,7 @@ export default {
         });
         this.userEvents = response.data.events || [];
       } catch (error) {
-        console.error('error loading events:', error);
+        console.error('Kļūda, ielādējot nodarbības:', error);
         this.userEvents = [];
       } finally {
         this.loadingEvents = false;
@@ -481,7 +481,7 @@ export default {
         });
         this.allGroups = response.data.groups || [];
       } catch (error) {
-        console.error('error loading groups:', error);
+        console.error('Kļūda, ielādējot grupas:', error);
         this.allGroups = [];
       } finally {
         this.loadingGroups = false;
@@ -502,7 +502,7 @@ export default {
         });
 
         this.allGroups.push(response.data.group);
-        this.message = 'Group created successfully!';
+        this.message = 'Grupa veiksmīgi izveidota!';
         this.cancelAddGroup();
         
         setTimeout(() => {
@@ -510,8 +510,8 @@ export default {
         }, 3000);
 
       } catch (error) {
-        console.error('error creating group:', error);
-        this.error = error.response?.data?.message || 'Failed to create group';
+        console.error('Kļūda, veidojot grupu:', error);
+        this.error = error.response?.data?.message || 'Neizdevās izveidot grupu';
       } finally {
         this.loadingCreate = false;
       }
@@ -527,7 +527,7 @@ export default {
     },
 
     async deleteGroup(groupId) {
-      if (confirm('Are you sure you want to delete this group?')) {
+      if (confirm('Vai tiešām vēlies dzēst šo grupu?')) {
         try {
           await axios.delete(`http://127.0.0.1:8000/api/admin/groups/${groupId}`, {
             headers: {
@@ -537,11 +537,11 @@ export default {
           });
 
           this.allGroups = this.allGroups.filter(g => g.group_id !== groupId);
-          this.message = 'Group deleted successfully';
+          this.message = 'Grupa veiksmīgi dzēsta';
 
         } catch (error) {
-          console.error('error deleting group:', error);
-          this.error = 'Failed to delete group';
+          console.error('Kļūda, dzēšot grupu:', error);
+          this.error = 'Neizdevās dzēst grupu';
         }
       }
     },
@@ -569,18 +569,18 @@ export default {
         localStorage.setItem('user', JSON.stringify(this.user));
         
         this.editMode = false;
-        this.message = 'profile updated successfully!';
+        this.message = 'Profils veiksmīgi atjaunināts!';
         
         setTimeout(() => {
           this.message = '';
         }, 3000);
 
       } catch (error) {
-        console.error('error updating profile:', error);
+        console.error('Kļūda, atjauninot profilu:', error);
         if (error.response && error.response.data) {
-          this.error = error.response.data.message || 'failed to update profile';
+          this.error = error.response.data.message || 'Neizdevās atjaunināt profilu';
         } else {
-          this.error = 'network error. please try again.';
+          this.error = 'Tīkla kļūda. Lūdzu, mēģini vēlreiz.';
         }
       } finally {
         this.loading = false;
@@ -611,19 +611,19 @@ export default {
           event.attendance_status = status;
         }
 
-        this.message = `event status updated to ${status}`;
+        this.message = `Nodarbības statuss atjaunināts uz: ${status}`;
         setTimeout(() => {
           this.message = '';
         }, 3000);
 
       } catch (error) {
-        console.error('error updating event status:', error);
-        this.error = 'failed to update event status';
+        console.error('Kļūda, atjauninot nodarbības statusu:', error);
+        this.error = 'Neizdevās atjaunināt nodarbības statusu';
       }
     },
 
     async leaveGroup(groupId) {
-      if (confirm('are you sure you want to leave this group?')) {
+      if (confirm('Vai tiešām vēlies pamest šo grupu?')) {
         try {
           await axios.delete(`http://127.0.0.1:8000/api/user/groups/${groupId}`, {
             headers: {
@@ -633,11 +633,11 @@ export default {
           });
 
           this.userGroups = this.userGroups.filter(g => g.id !== groupId);
-          this.message = 'successfully left the group';
+          this.message = 'Tu veiksmīgi pameti grupu';
 
         } catch (error) {
-          console.error('error leaving group:', error);
-          this.error = 'failed to leave group';
+          console.error('Kļūda, pametot grupu:', error);
+          this.error = 'Neizdevās pamest grupu';
         }
       }
     },

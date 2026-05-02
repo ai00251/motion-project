@@ -1,9 +1,9 @@
 <template>
   <div class="forgot-password-page">
     <div class="forgot-password-container">
-      <h2 class="forgot-password-title">set new password</h2>
+      <h2 class="forgot-password-title">iestatīt jaunu paroli</h2>
       <p class="forgot-password-description">
-        enter your email and create a new secure password
+        ievadi savu e-pastu un izveido jaunu drošu paroli
       </p>
       
       <div v-if="message" class="success-message">
@@ -18,32 +18,32 @@
         <input 
           v-model="email"
           type="email" 
-          placeholder="e-mail" 
+          placeholder="e-pasts" 
           class="forgot-password-input"
           required
         >
         <input 
           v-model="password"
           type="password" 
-          placeholder="new password" 
+          placeholder="jaunā parole" 
           class="forgot-password-input"
           required
         >
         <input 
           v-model="password_confirmation"
           type="password" 
-          placeholder="confirm password" 
+          placeholder="apstiprini paroli" 
           class="forgot-password-input"
           required
         >
         <button type="submit" class="forgot-password-button" :disabled="loading">
-          {{ loading ? 'resetting...' : 'reset password' }}
+          {{ loading ? 'atiestata...' : 'atiestatīt paroli' }}
         </button>
       </form>
       
       <p class="back-to-signin-text">
-        suddenly remembered your password? 
-        <router-link to="/signin" class="back-to-signin-link">sign in</router-link>
+        pēkšņi atcerējies savu paroli? 
+        <router-link to="/signin" class="back-to-signin-link">pieslēgties</router-link>
       </p>
     </div>
   </div>
@@ -73,12 +73,12 @@ export default {
       const token = this.$route.query.token;
       
       if (!token) {
-        this.error = 'Invalid reset token';
+        this.error = 'Nederīgs paroles atiestatīšanas tokens';
         this.loading = false;
         return;
       }
       
-      console.log('Making reset password API call...');
+      console.log('Veicu paroles atiestatīšanas API pieprasījumu...');
       
       try {
         const response = await axios.post('http://127.0.0.1:8000/api/reset-password', {
@@ -93,7 +93,7 @@ export default {
           }
         });
         
-        console.log('Success:', response.data);
+        console.log('Veiksmīgi:', response.data);
         this.message = response.data.message;
         
         // Redirect to login after 3 seconds
@@ -102,11 +102,11 @@ export default {
         }, 3000);
         
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Kļūda:', error);
         if (error.response && error.response.data) {
-          this.error = error.response.data.message || 'An error occurred';
+          this.error = error.response.data.message || 'Radās kļūda';
         } else {
-          this.error = 'Network error. Please try again.';
+          this.error = 'Tīkla kļūda. Lūdzu, mēģini vēlreiz.';
         }
       } finally {
         this.loading = false;

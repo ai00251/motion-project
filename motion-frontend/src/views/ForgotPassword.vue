@@ -1,38 +1,38 @@
 <template>
-  <div class="forgot-password-page">
-    <div class="forgot-password-container">
-      <h2 class="forgot-password-title">reset password</h2>
-      <p class="forgot-password-description">
-        enter your email address and we'll send you a link to reset your password
-      </p>
-      
-      <div v-if="message" class="success-message">
-        {{ message }}
-      </div>
-      
-      <div v-if="error" class="error-message">
-        {{ error }}
-      </div>
-      
-      <form class="forgot-password-form" @submit.prevent="handleForgotPassword">
-        <input 
-          v-model="email"
-          type="email" 
-          placeholder="e-mail" 
-          class="forgot-password-input"
-          required
-        >
-        <button type="submit" class="forgot-password-button" :disabled="loading">
-          {{ loading ? 'sending...' : 'send reset link' }}
-        </button>
-      </form>
-      
-      <p class="back-to-signin-text">
-        suddenly remembered your password? 
-        <router-link to="/signin" class="back-to-signin-link">sign in</router-link>
-      </p>
+<div class="forgot-password-page">
+  <div class="forgot-password-container">
+    <h2 class="forgot-password-title">atjaunot paroli</h2>
+    <p class="forgot-password-description">
+      ievadi savu e-pasta adresi, un mēs nosūtīsim tev saiti paroles atjaunošanai
+    </p>
+    
+    <div v-if="message" class="success-message">
+      {{ message }}
     </div>
+    
+    <div v-if="error" class="error-message">
+      {{ error }}
+    </div>
+    
+    <form class="forgot-password-form" @submit.prevent="handleForgotPassword">
+      <input 
+        v-model="email"
+        type="email" 
+        placeholder="e-pasts" 
+        class="forgot-password-input"
+        required
+      >
+      <button type="submit" class="forgot-password-button" :disabled="loading">
+        {{ loading ? 'sūta...' : 'nosūtīt atjaunošanas saiti' }}
+      </button>
+    </form>
+    
+    <p class="back-to-signin-text">
+      pēkšņi atcerējies savu paroli? 
+      <router-link to="/signin" class="back-to-signin-link">pieslēgties</router-link>
+    </p>
   </div>
+</div>
 </template>
 
 <script>
@@ -54,7 +54,7 @@ export default {
       this.message = '';
       this.error = '';
       
-      console.log('Making API call to forgot password...');
+      console.log('Veicu API pieprasījumu paroles atiestatīšanai...');
       
       try {
         const response = await axios.post('http://127.0.0.1:8000/api/forgot-password', {
@@ -66,15 +66,15 @@ export default {
           }
         });
         
-        console.log('Success:', response.data);
+        console.log('Veiksmīgi:', response.data);
         this.message = response.data.message;
         this.email = '';
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Kļūda:', error);
         if (error.response && error.response.data) {
-          this.error = error.response.data.message || 'An error occurred';
+          this.error = error.response.data.message || 'Radās kļūda';
         } else {
-          this.error = 'Network error. Please try again.';
+          this.error = 'Tīkla kļūda. Lūdzu, mēģini vēlreiz.';
         }
       } finally {
         this.loading = false;

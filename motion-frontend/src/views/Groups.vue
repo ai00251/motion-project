@@ -2,9 +2,9 @@
   <div class="groups-page">
     <div class="groups-container">
       <div class="page-header">
-        <h1 class="page-title">join our community</h1>
+        <h1 class="page-title">pievienojies mūsu kopienai</h1>
         <p class="page-subtitle">
-          discover dance groups and explore styles that match your passion
+          atklāj deju grupas un iepazīsti stilus, kas atbilst tavai aizrautībai
         </p>
         
         <!-- Tab Navigation -->
@@ -15,7 +15,7 @@
             :class="{ active: activeTab === 'groups' }"
           >
             <i class="fa-solid fa-users"></i>
-            groups
+            grupas
           </button>
           <button 
             @click="activeTab = 'styles'" 
@@ -23,7 +23,7 @@
             :class="{ active: activeTab === 'styles' }"
           >
             <i class="fa-solid fa-music"></i>
-            styles
+            stili
           </button>
         </div>
 
@@ -34,17 +34,17 @@
             <input 
               v-model="searchQuery" 
               type="text" 
-              :placeholder="activeTab === 'groups' ? 'search groups...' : 'search styles...'"
+              :placeholder="activeTab === 'groups' ? 'meklēt grupas...' : 'meklēt stilus...'"
               class="search-input"
             />
           </div>
           
           <div class="filter-controls">
             <select v-model="selectedLevel" class="filter-select">
-              <option value="">all levels</option>
-              <option value="beginner">beginner</option>
-              <option value="intermediate">intermediate</option>
-              <option value="advanced">advanced</option>
+              <option value="">visi līmeņi</option>
+              <option value="beginner">iesācēju</option>
+              <option value="intermediate">vidējs</option>
+              <option value="advanced">augstāks</option>
             </select>
           </div>
         </div>
@@ -53,14 +53,14 @@
       <!-- Loading State -->
       <div v-if="loading" class="loading-state">
         <div class="loading-spinner"></div>
-        <p>loading {{ activeTab }}...</p>
+        <p>ielādē {{ activeTab === 'groups' ? 'grupas' : 'stilus' }}...</p>
       </div>
 
       <!-- Empty State -->
       <div v-else-if="filteredItems.length === 0" class="empty-state">
         <i class="fa-solid fa-search"></i>
-        <h3>no {{ activeTab }} found</h3>
-        <p>try adjusting your search or filters</p>
+        <h3>{{ activeTab === 'groups' ? 'grupas nav atrastas' : 'stili nav atrasti' }}</h3>
+        <p>mēģini mainīt meklēšanas vai filtra nosacījumus</p>
       </div>
 
       <!-- Groups Tab Content -->
@@ -85,12 +85,12 @@
           <div class="card-content">
             <h3 class="card-title">{{ group.name || group.title }}</h3>
             <p class="card-description">{{ group.description }}</p>
-            <p class="card-style">style: {{ group.style }}</p>
+            <p class="card-style">stils: {{ group.style }}</p>
             
             <div class="card-details">
               <div class="detail-item">
                 <i class="fa-solid fa-calendar"></i>
-                <span>{{ group.duration }} weeks</span>
+                <span>{{ group.duration }} nedēļas</span>
               </div>
               <div class="detail-item">
                 <i class="fa-solid fa-clock"></i>
@@ -109,11 +109,9 @@
               <span>{{ group.current_participants || group.member_count }}/{{ group.max_participants || 20 }}</span>
             </div>
             <button class="join-btn">
-  join group
-  <i class="fa-solid fa-arrow-right"></i>
-</button>
-
-
+              pievienoties grupai
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -146,7 +144,7 @@
           
           <div class="style-footer">
             <div class="difficulty">
-              <span class="difficulty-label">difficulty:</span>
+              <span class="difficulty-label">grūtības pakāpe:</span>
               <div class="difficulty-dots">
                 <span 
                   v-for="i in 5" 
@@ -157,7 +155,7 @@
               </div>
             </div>
             <button class="explore-btn">
-              explore style
+              izpētīt stilu
               <i class="fa-solid fa-external-link-alt"></i>
             </button>
           </div>
@@ -179,7 +177,7 @@
               <div class="modal-info">
                 <h2>{{ selectedItem.name || selectedItem.title }}</h2>
                 <p class="modal-subtitle">
-                  {{ selectedType === 'group' ? selectedItem.level + ' level group' : 'dance style' }}
+                  {{ selectedType === 'group' ? selectedItem.level + ' līmeņa grupa' : 'deju stils' }}
                 </p>
               </div>
             </div>
@@ -188,11 +186,11 @@
               <p class="modal-description">{{ selectedItem.description }}</p>
               
               <div v-if="selectedType === 'group'" class="group-details">
-                <h4>group details</h4>
+                <h4>grupas informācija</h4>
                 <div class="detail-grid">
                   <div class="detail-card">
                     <i class="fa-solid fa-calendar"></i>
-                    <span>{{ selectedItem.duration }} weeks</span>
+                    <span>{{ selectedItem.duration }} nedēļas</span>
                   </div>
                   <div class="detail-card">
                     <i class="fa-solid fa-clock"></i>
@@ -204,19 +202,18 @@
                   </div>
                   <div class="detail-card">
                     <i class="fa-solid fa-users"></i>
-                    <span>{{ selectedItem.current_participants || selectedItem.member_count }}/{{ selectedItem.max_participants || 20 }} spots</span>
+                    <span>{{ selectedItem.current_participants || selectedItem.member_count }}/{{ selectedItem.max_participants || 20 }} vietas</span>
                   </div>
                 </div>
                 
                 <button class="modal-action-btn" @click="joinGroup(selectedItem.id)">
-  join this group
-  <i class="fa-solid fa-arrow-right"></i>
-</button>
-
+                  pievienoties šai grupai
+                  <i class="fa-solid fa-arrow-right"></i>
+                </button>
               </div>
               
               <div v-else class="style-details">
-                <h4>what you'll learn</h4>
+                <h4>ko tu iemācīsies</h4>
                 <div class="features-grid">
                   <div 
                     v-for="feature in getStyleFeatures(styles.indexOf(selectedItem))" 
@@ -229,7 +226,7 @@
                 </div>
                 
                 <button class="modal-action-btn">
-                  find {{ selectedItem.title }} groups
+                  atrast {{ selectedItem.title }} grupas
                   <i class="fa-solid fa-search"></i>
                 </button>
               </div>
@@ -293,129 +290,128 @@ export default {
   },
 
   methods: {
-  async loadData() {
-    this.loading = true;
-    try {
-      const [groupsResponse, stylesResponse] = await Promise.all([
-        axios.get('http://127.0.0.1:8000/api/groups'),
-        axios.get('http://127.0.0.1:8000/api/styles')
-      ]);
-      
-      this.groups = groupsResponse.data.groups;
-      this.styles = stylesResponse.data.styles;
-      
-      console.log('Loaded groups:', this.groups);
-      console.log('Loaded styles:', this.styles);
-      
-    } catch (error) {
-      console.error('Error loading data:', error);
-      this.groups = [];
-      this.styles = [
-        { title: 'hip-hop', description: 'urban dance style emphasizing rhythm and personal expression' }
-      ];
-    } finally {
-      this.loading = false;
-    }
-  },
-
-  async joinGroup(groupId) {
-    try {
-      const token = localStorage.getItem('auth_token');
-      
-      if (!token) {
-        alert('Please log in to join a group');
-        this.$router.push('/signin');
-        return;
+    async loadData() {
+      this.loading = true;
+      try {
+        const [groupsResponse, stylesResponse] = await Promise.all([
+          axios.get('http://127.0.0.1:8000/api/groups'),
+          axios.get('http://127.0.0.1:8000/api/styles')
+        ]);
+        
+        this.groups = groupsResponse.data.groups;
+        this.styles = stylesResponse.data.styles;
+        
+        console.log('Ielādētās grupas:', this.groups);
+        console.log('Ielādētie stili:', this.styles);
+        
+      } catch (error) {
+        console.error('Kļūda, ielādējot datus:', error);
+        this.groups = [];
+        this.styles = [
+          { title: 'hip-hop', description: 'urbāns deju stils, kas izceļ ritmu un personisko izteiksmi' }
+        ];
+      } finally {
+        this.loading = false;
       }
-      
-      const response = await axios.post(`http://127.0.0.1:8000/api/groups/${groupId}/join`, {}, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+    },
+
+    async joinGroup(groupId) {
+      try {
+        const token = localStorage.getItem('auth_token');
+        
+        if (!token) {
+          alert('Lūdzu, pieslēdzies, lai pievienotos grupai');
+          this.$router.push('/signin');
+          return;
         }
-      });
-      
-      if (response.data.success) {
-  alert('Successfully joined the group!');
-  this.closeModal();
-  this.loadData();
-  await this.refreshUserData();
-}
+        
+        const response = await axios.post(`http://127.0.0.1:8000/api/groups/${groupId}/join`, {}, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.data.success) {
+          alert('Tu veiksmīgi pievienojies grupai!');
+          this.closeModal();
+          this.loadData();
+          await this.refreshUserData();
+        }
 
-    } catch (error) {
-      if (error.response && error.response.data) {
-        alert(error.response.data.message);
-      } else {
-        alert('Failed to join group. Please try again.');
+      } catch (error) {
+        if (error.response && error.response.data) {
+          alert(error.response.data.message);
+        } else {
+          alert('Neizdevās pievienoties grupai. Lūdzu, mēģini vēlreiz.');
+        }
+        console.error('Grupas pievienošanās kļūda:', error);
       }
-      console.error('Join group error:', error);
+    },
+
+    async refreshUserData() {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/api/user', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+            'Accept': 'application/json'
+          }
+        });
+        
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        
+        window.dispatchEvent(new CustomEvent('user-role-changed', {
+          detail: { user: response.data.user }
+        }));
+        
+      } catch (error) {
+        console.error('Kļūda, atjaunojot lietotāja datus:', error);
+      }
+    },
+
+    getStyleIcon(styleTitle) {
+      const icons = {
+        'hip-hop': 'fa-solid fa-music',
+        'contemporary': 'fa-solid fa-heart',
+        'breaking': 'fa-solid fa-bolt',
+        'jazz': 'fa-solid fa-theater-masks',
+        'ballet': 'fa-solid fa-feather',
+        'commercial': 'fa-solid fa-video',
+        'lyrical': 'fa-solid fa-dove',
+        'street jazz': 'fa-solid fa-city'
+      };
+      return icons[styleTitle?.toLowerCase()] || 'fa-solid fa-music';
+    },
+
+    getStyleFeatures(index) {
+      const features = [
+        ['ritms', 'frīstails', 'battle'],
+        ['plūdums', 'emocijas', 'stāstījums'],
+        ['spēka elementi', 'toprock', 'freezes'],
+        ['tehnika', 'performance', 'izteiksme'],
+        ['grācija', 'precizitāte', 'disciplīna'],
+        ['komerciālā deja', 'mūzikas video', 'industrija'],
+        ['emocijas', 'plūdums', 'saikne'],
+        ['urbāns', 'iela', 'attieksme']
+      ];
+      return features[index] || ['kustība', 'izteiksme', 'radošums'];
+    },
+
+    getStyleDifficulty(index) {
+      const difficulties = [3, 2, 5, 3, 4, 3, 2, 4];
+      return difficulties[index] || 3;
+    },
+
+    selectItem(item, type) {
+      this.selectedItem = item;
+      this.selectedType = type;
+    },
+
+    closeModal() {
+      this.selectedItem = null;
+      this.selectedType = null;
     }
-  },
-
-async refreshUserData() {
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/api/user', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-        'Accept': 'application/json'
-      }
-    });
-    
-    localStorage.setItem('user', JSON.stringify(response.data.user));
-    
-    window.dispatchEvent(new CustomEvent('user-role-changed', {
-      detail: { user: response.data.user }
-    }));
-    
-  } catch (error) {
-    console.error('Error refreshing user data:', error);
   }
-},
-
-  getStyleIcon(styleTitle) {
-    const icons = {
-      'hip-hop': 'fa-solid fa-music',
-      'contemporary': 'fa-solid fa-heart',
-      'breaking': 'fa-solid fa-bolt',
-      'jazz': 'fa-solid fa-theater-masks',
-      'ballet': 'fa-solid fa-feather',
-      'commercial': 'fa-solid fa-video',
-      'lyrical': 'fa-solid fa-dove',
-      'street jazz': 'fa-solid fa-city'
-    };
-    return icons[styleTitle?.toLowerCase()] || 'fa-solid fa-music';
-  },
-
-  getStyleFeatures(index) {
-    const features = [
-      ['rhythm', 'freestyle', 'battles'],
-      ['flow', 'emotion', 'storytelling'],
-      ['power moves', 'toprock', 'freezes'],
-      ['technique', 'performance', 'expression'],
-      ['grace', 'precision', 'discipline'],
-      ['commercial', 'music videos', 'industry'],
-      ['emotion', 'fluidity', 'connection'],
-      ['urban', 'street', 'attitude']
-    ];
-    return features[index] || ['movement', 'expression', 'creativity'];
-  },
-
-  getStyleDifficulty(index) {
-    const difficulties = [3, 2, 5, 3, 4, 3, 2, 4];
-    return difficulties[index] || 3;
-  },
-
-  selectItem(item, type) {
-    this.selectedItem = item;
-    this.selectedType = type;
-  },
-
-  closeModal() {
-    this.selectedItem = null;
-    this.selectedType = null;
-  }
-}
-
 }
 </script>
 

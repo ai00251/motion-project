@@ -2,9 +2,9 @@
   <div class="crew-page">
     <div class="crew-container">
       <div class="page-header">
-        <h1 class="page-title">meet our crew</h1>
+        <h1 class="page-title">iepazīsti mūsu komandu</h1>
         <p class="page-subtitle">
-          passionate instructors dedicated to bringing out the best in every dancer
+          aizrautīgi pasniedzēji, kuri palīdz katram dejotājam sasniegt savu labāko versiju
         </p>
         
         <!-- Search and Sort Controls -->
@@ -14,7 +14,7 @@
             <input 
               v-model="searchQuery" 
               type="text" 
-              placeholder="search instructors..."
+              placeholder="meklēt pasniedzējus..."
               class="search-input"
             />
           </div>
@@ -36,13 +36,13 @@
 
       <div v-if="loading" class="loading-state">
         <div class="loading-spinner"></div>
-        <p>loading our amazing instructors...</p>
+        <p>ielādējam mūsu lieliskos pasniedzējus...</p>
       </div>
 
       <div v-else-if="filteredInstructors.length === 0" class="empty-state">
         <i class="fa-solid fa-search"></i>
-        <h3>no instructors found</h3>
-        <p>try adjusting your search terms</p>
+        <h3>pasniedzēji nav atrasti</h3>
+        <p>mēģini mainīt meklēšanas frāzi</p>
       </div>
 
       <div v-else class="instructors-masonry">
@@ -64,7 +64,7 @@
             <div class="image-overlay">
               <div class="overlay-content">
                 <i class="fa-solid fa-eye"></i>
-                <span>view profile</span>
+                <span>skatīt profilu</span>
               </div>
             </div>
           </div>
@@ -78,10 +78,10 @@
             <div class="card-footer">
               <div class="experience-badge">
                 <i class="fa-solid fa-star"></i>
-                <span>{{ getExperience(index) }} years</span>
+                <span>{{ getExperience(index) }} gadi</span>
               </div>
               <button class="learn-more-btn">
-                learn more
+                uzzināt vairāk
                 <i class="fa-solid fa-arrow-right"></i>
               </button>
             </div>
@@ -109,22 +109,22 @@
               <div class="modal-stats">
                 <div class="stat">
                   <i class="fa-solid fa-calendar"></i>
-                  <span>{{ getExperience(selectedIndex) }} years experience</span>
+                  <span>{{ getExperience(selectedIndex) }} gadu pieredze</span>
                 </div>
                 <div class="stat">
                   <i class="fa-solid fa-users"></i>
-                  <span>{{ getStudentCount(selectedIndex) }}+ students taught</span>
+                  <span>{{ getStudentCount(selectedIndex) }}+ apmācīti audzēkņi</span>
                 </div>
               </div>
             </div>
           </div>
           
           <div class="modal-body">
-            <h3>about {{ selectedInstructor.name.split(' ')[0] }}</h3>
+            <h3>par {{ selectedInstructor.name.split(' ')[0] }}</h3>
             <p class="full-bio">{{ selectedInstructor.description }}</p>
             
             <div class="specialties-section">
-              <h4>specialties</h4>
+              <h4>specializācijas</h4>
               <div class="specialty-tags">
                 <span 
                   v-for="specialty in getSpecialties(selectedIndex)" 
@@ -193,7 +193,7 @@ export default {
       switch (this.sortOrder) {
         case 'asc': return 'a-z';
         case 'desc': return 'z-a';
-        default: return 'sort';
+        default: return 'kārtot';
       }
     }
   },
@@ -206,10 +206,10 @@ export default {
         const response = await axios.get('http://127.0.0.1:8000/api/instructors');
         this.instructors = response.data.instructors;
       } catch (error) {
-        console.error('Error loading instructors:', error);
+        console.error('Kļūda, ielādējot pasniedzējus:', error);
         this.instructors = [
-          { name: 'ketija čarma', photo: 'https://via.placeholder.com/300x400', description: 'commercial dance specialist with years of experience' },
-          { name: 'džeisons rīvs', photo: 'https://via.placeholder.com/300x350', description: 'street dance expert and choreographer' }
+          { name: 'ketija čarma', photo: 'https://via.placeholder.com/300x400', description: 'komerciālās dejas speciāliste ar ilggadēju pieredzi' },
+          { name: 'džeisons rīvs', photo: 'https://via.placeholder.com/300x350', description: 'street deju eksperts un horeogrāfs' }
         ];
       } finally {
         this.loading = false;
@@ -232,11 +232,11 @@ export default {
 
     getSpecialty(index) {
       const specialties = [
-        'commercial dance', 'street & hip-hop', 'contemporary & jazz', 'breaking & popping',
-        'lyrical & ballet', 'musical theatre', 'urban choreography', 'freestyle & battle',
-        'modern fusion', 'dance theatre'
+        'komerciālā deja', 'iela un hiphops', 'laikmetīgā deja un džezs', 'breiks un popping',
+        'liriskā deja un balets', 'muzikālais teātris', 'urbānā horeogrāfija', 'frīstails un battle',
+        'modernā saplūsme', 'dejas teātris'
       ];
-      return specialties[index] || 'dance instructor';
+      return specialties[index] || 'deju pasniedzējs';
     },
 
     getExperience(index) {
@@ -251,22 +251,22 @@ export default {
 
     getSpecialties(index) {
       const specialtyLists = [
-        ['commercial', 'jazz funk', 'music video'],
-        ['hip-hop', 'breaking', 'popping', 'locking'],
-        ['contemporary', 'jazz', 'lyrical'],
-        ['breaking', 'power moves', 'battle'],
-        ['ballet', 'lyrical', 'modern'],
-        ['jazz', 'theatre', 'broadway'],
-        ['urban', 'street jazz', 'commercial'],
-        ['freestyle', 'house', 'waacking'],
-        ['modern', 'contemporary', 'fusion'],
-        ['theatre', 'storytelling', 'performance']
+        ['komerciālā deja', 'jazz funk', 'mūzikas video'],
+        ['hiphops', 'breiks', 'popping', 'locking'],
+        ['laikmetīgā deja', 'džezs', 'liriskā deja'],
+        ['breiks', 'spēka elementi', 'battle'],
+        ['balets', 'liriskā deja', 'modernais stils'],
+        ['džezs', 'teātris', 'brodveja'],
+        ['urbānā deja', 'street jazz', 'komerciālā deja'],
+        ['frīstails', 'house', 'waacking'],
+        ['modernā deja', 'laikmetīgā deja', 'fusion'],
+        ['teātris', 'stāstniecība', 'skatuves performance']
       ];
-      return specialtyLists[index] || ['dance', 'movement', 'expression'];
+      return specialtyLists[index] || ['deja', 'kustība', 'izteiksme'];
     },
 
     truncateBio(bio) {
-      if (!bio) return 'passionate dance instructor...';
+      if (!bio) return 'aizrautīgs deju pasniedzējs...';
       return bio.length > 100 ? bio.substring(0, 100) + '...' : bio;
     },
 
@@ -281,7 +281,7 @@ export default {
     },
 
     handleImageError(event) {
-      event.target.src = 'https://via.placeholder.com/300x400/333/fff?text=Instructor';
+      event.target.src = 'https://via.placeholder.com/300x400/333/fff?text=Pasniedz%C4%93js';
     }
   }
 }
