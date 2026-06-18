@@ -27,7 +27,7 @@
     </section>
 
     <section class="classes-section">
-      <h2>mūsu nodarbības</h2>
+      <h2>mūsu stili</h2>
       <div v-if="loadingStyles" class="loading-state">
         ielādē deju stilus...
       </div>

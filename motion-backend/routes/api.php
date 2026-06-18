@@ -19,6 +19,8 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('
 Route::get('/styles', [StyleController::class, 'index']);
 Route::get('/instructors', [InstructorController::class, 'index']);
 Route::get('/groups', [GroupController::class, 'index']);
+Route::get('/events', [EventController::class, 'index']);
+Route::get('/events/{id}', [EventController::class, 'show']);
 
 // Protected routes (authentication required)
 Route::middleware('auth:sanctum')->group(function () {
@@ -41,10 +43,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Group joining - ONLY ContractController now
     Route::post('/groups/{id}/join', [ContractController::class, 'joinGroup']);
     
-    // Browse available groups and events (detailed views)
+    // Browse available groups and events (detailed views) IDKKKKK
     Route::get('/groups/{id}', [GroupController::class, 'show']);
-    Route::get('/events', [EventController::class, 'index']);
-    Route::get('/events/{id}', [EventController::class, 'show']);
     
     // Admin event management
     Route::post('/events', [EventController::class, 'store']);

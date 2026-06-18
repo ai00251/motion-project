@@ -11,16 +11,19 @@ use Carbon\Carbon;
 
 class ContractController extends Controller
 {
+    // pievieno lietotāju grupai un izveido jaunu līgumu
     public function joinGroup(Request $request, $groupId)
     {
         try {
             $user = Auth::user();
             $group = Group::findOrFail($groupId);
 
+            // ja klienta ieraksta vēl nav, tas tiek izveidots automātiski
             $client = Client::firstOrCreate([
                 "user_id" => $user->user_id,
             ]);
 
+            // pārbauda, vai lietotājs jau nav šajā grupā
             $existingContract = Contract::where("client_id", $client->client_id)
                 ->where("group_id", $groupId)
                 ->first();
@@ -28,13 +31,14 @@ class ContractController extends Controller
             if ($existingContract) {
                 return response()->json(
                     [
-                        "message" => "You are already enrolled in this group",
+                        "message" => "you are already enrolled in this group",
                         "success" => false,
                     ],
                     400
                 );
             }
 
+            // sagatavo līgumu ar reģistrācijas datumu, beigu datumu un mēneša maksu
             $contract = Contract::create([
                 "client_id" => $client->client_id,
                 "group_id" => $groupId,
@@ -45,16 +49,17 @@ class ContractController extends Controller
 
             return response()->json(
                 [
-                    "message" => "Successfully joined the group!",
+                    "message" => "successfully joined the group!",
                     "contract" => $contract,
                     "success" => true,
                 ],
                 201
             );
         } catch (\Exception $e) {
+            // ja rodas kļūda, atgriež precīzu paziņojumu ar statusu 500
             return response()->json(
                 [
-                    "message" => "Failed to join group: " . $e->getMessage(),
+                    "message" => "failed to join group: " . $e->getMessage(),
                     "success" => false,
                 ],
                 500
@@ -62,6 +67,7 @@ class ContractController extends Controller
         }
     }
 
+    // aprēķina grupas maksu pēc tās līmeņa
     private function calculateFee($group)
     {
         $baseFees = [
@@ -70,6 +76,7 @@ class ContractController extends Controller
             "advanced" => 180,
         ];
 
+        // ja līmenis nav definēts, izmanto noklusēto maksu
         return $baseFees[$group->level] ?? 140;
     }
 }

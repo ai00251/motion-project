@@ -9,7 +9,7 @@
       <router-link to="/" class="nav-link">sākums</router-link>
       <router-link to="/groups" class="nav-link">grupas</router-link>
       <router-link to="/crew" class="nav-link">komanda</router-link>
-      <a href="#" class="nav-link">nodarbības</a>
+      <router-link to="/events" class="nav-link">nodarbības</router-link>
 
       <router-link 
         v-if="!isLoggedIn" 

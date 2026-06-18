@@ -43,6 +43,11 @@ const routes = [
     path: '/groups',
     name: 'Groups',
     component: () => import('../views/Groups.vue')
+  },
+  {
+    path: '/events',
+    name: 'events',
+    component: () => import('../views/Events.vue')
   }
 ]
 

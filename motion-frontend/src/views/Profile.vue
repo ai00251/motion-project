@@ -175,7 +175,6 @@
                 <p><strong>loma:</strong> {{ group.role }}</p>
               </div>
               <div class="card-actions">
-                <button class="action-btn small">skatīt detaļas</button>
                 <button class="action-btn small danger" @click="leaveGroup(group.id)">
                   pamest grupu
                 </button>
@@ -294,44 +293,52 @@
             ielādē nodarbības...
           </div>
           
-          <div v-else-if="userEvents.length > 0" class="content-grid">
-            <div v-for="event in userEvents" :key="event.id" class="content-card">
-              <div class="card-header">
-                <h4>{{ event.name }}</h4>
-                <span class="status-badge" :class="event.attendance_status">
-                  {{ event.attendance_status }}
-                </span>
-              </div>
-              <div class="card-body">
-                <p><i class="fa-solid fa-calendar"></i> {{ formatDate(event.date) }}</p>
-                <p><i class="fa-solid fa-clock"></i> {{ event.time }}</p>
-                <p><i class="fa-solid fa-location-dot"></i> {{ event.location }}</p>
-                <p><strong>apraksts:</strong> {{ event.description }}</p>
-              </div>
-              <div class="card-actions">
-                <button 
-                  v-if="event.attendance_status === 'pending'" 
-                  class="action-btn small primary"
-                  @click="updateEventStatus(event.id, 'confirmed')"
-                >
-                  apstiprināt
-                </button>
-                <button 
-                  v-if="event.attendance_status !== 'cancelled'" 
-                  class="action-btn small danger"
-                  @click="updateEventStatus(event.id, 'cancelled')"
-                >
-                  atcelt
-                </button>
-              </div>
-            </div>
-          </div>
+<div v-else-if="userEvents.length > 0" class="content-grid">
+  <div
+    v-for="event in sortedUserEvents"
+    :key="event.id"
+    class="content-card"
+    :class="isPastEvent(event) ? 'past-event-card' : 'upcoming-event-card'"
+  >
+    <div class="card-header">
+      <h4>{{ event.name }}</h4>
+      <span
+        class="status-badge"
+        :class="isPastEvent(event) ? 'past' : event.attendance_status"
+      >
+        {{ isPastEvent(event) ? 'notikusi' : event.attendance_status }}
+      </span>
+    </div>
+
+    <div class="card-body">
+      <p><i class="fa-solid fa-calendar"></i> {{ formatDate(event.start_date) }}</p>
+      <p><i class="fa-solid fa-clock"></i> {{ event.start_time }}</p>
+      <p><i class="fa-solid fa-location-dot"></i> {{ formatLocation(event.hall) }}</p>
+      <p><i class="fa-solid fa-hourglass-half"></i> {{ event.duration_minutes }} min</p>
+      <p><strong>apraksts:</strong> {{ event.description }}</p>
+    </div>
+
+    <div class="card-actions">
+      <button
+        v-if="!isPastEvent(event) && event.attendance_status !== 'cancelled'"
+        class="action-btn small danger"
+        @click="updateEventStatus(event.id, 'cancelled')"
+      >
+        atcelt
+      </button>
+
+      <span v-if="isPastEvent(event)" class="past-event-note">
+        šo nodarbību vairs nevar atcelt
+      </span>
+    </div>
+  </div>
+</div>
           
           <div v-else class="empty-state">
             <i class="fa-solid fa-calendar-xmark"></i>
             <h4>nodarbības nav atrastas</h4>
             <p>tev nav ieplānotu gaidāmo nodarbību.</p>
-            <button class="action-btn primary">apskatīt nodarbības</button>
+            <router-link to="/events" class="action-btn primary"> apskatīt nodarbības</router-link>
           </div>
         </div>
 
@@ -375,6 +382,22 @@ export default {
       }
     }
   },
+  computed: {
+  sortedUserEvents() {
+    return [...this.userEvents].sort((a, b) => {
+      const aPast = this.isPastEvent(a)
+      const bPast = this.isPastEvent(b)
+
+      if (aPast !== bPast) {
+        return aPast ? 1 : -1
+      }
+
+      const dateA = new Date(`${a.start_date}T${a.start_time || '00:00:00'}`)
+      const dateB = new Date(`${b.start_date}T${b.start_time || '00:00:00'}`)
+      return dateA - dateB
+    })
+  }
+},
   mounted() {
     this.loadUserData();
     window.addEventListener('user-role-changed', this.handleRoleChange);
@@ -384,6 +407,13 @@ export default {
   },
 
   methods: {
+
+    isPastEvent(event) {
+  if (!event?.start_date) return false
+  const eventDateTime = new Date(`${event.start_date}T${event.start_time || '00:00:00'}`)
+  return eventDateTime < new Date()
+},
+
     handleRoleChange(event) {
       this.user = event.detail.user;
       this.userRole = event.detail.user.role;
@@ -396,6 +426,11 @@ export default {
       }
     },
 
+    formatLocation(value) {
+  if (!value) return '—'
+  return String(value).replaceAll('_', ' ')
+},
+
     async loadUserData() {
       try {
         const response = await axios.get('http://127.0.0.1:8000/api/user', {
@@ -406,7 +441,7 @@ export default {
         });
         
         this.user = response.data.user;
-        this.userRole = response.data.user.role;
+        this.userRole = response.data.role || response.data.user.role;
         this.editUser = { ...this.user };
         
         localStorage.setItem('user', JSON.stringify(this.user));
@@ -452,22 +487,26 @@ export default {
     },
 
     async loadUserEvents() {
-      this.loadingEvents = true;
-      try {
-        const response = await axios.get('http://127.0.0.1:8000/api/user/events', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-            'Accept': 'application/json'
-          }
-        });
-        this.userEvents = response.data.events || [];
-      } catch (error) {
-        console.error('Kļūda, ielādējot nodarbības:', error);
-        this.userEvents = [];
-      } finally {
-        this.loadingEvents = false;
+  this.loadingEvents = true
+  try {
+    const response = await axios.get('http://127.0.0.1:8000/api/user/events', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        Accept: 'application/json'
       }
-    },
+    })
+    console.log('USER EVENTS RESPONSE:', response.data)
+    this.userEvents = response.data.events || []
+} catch (error) {
+  console.error('Kļūda, ielādējot nodarbības:', error)
+  console.log('STATUS:', error.response?.status)
+  console.log('DATA:', error.response?.data)
+  console.log('FULL ERROR:', error)
+  this.userEvents = []
+} finally {
+    this.loadingEvents = false
+  }
+},
 
     // Admin Methods
     async loadAllGroups() {
@@ -1153,6 +1192,27 @@ export default {
   margin-top: 40px;
   padding-top: 30px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.past-event-card {
+  opacity: 0.7;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.upcoming-event-card {
+  border: 1px solid rgba(255, 220, 143, 0.2);
+}
+
+.status-badge.past {
+  background: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.past-event-note {
+  font-family: 'NeueHaasDisplay', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 </style>

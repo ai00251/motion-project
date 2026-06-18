@@ -7,20 +7,38 @@ use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
+    // atgriež visus pasākumus kopā ar saistīto stilu informāciju
     public function index()
     {
-        $events = Event::with('style')->get();
-        
+        // ielādē stilu datus un pārveido tos frontenda vajadzībām
+        $events = Event::with('style')->get()->map(function ($event) {
+            return [
+                'id' => $event->event_id,
+                'name' => $event->style->title ?? 'dance class',
+                'description' => $event->style->description ?? '',
+                'level' => $event->level,
+                'duration_minutes' => $event->duration_minutes,
+                'hall' => $event->hall,
+                'start_date' => $event->start_date,
+                'start_time' => $event->start_time,
+                'capacity' => $event->capacity,
+                'image' => $event->style->image ?? null,
+                'registered_count' => $event->registrations()->count()
+            ];
+        });
+
         return response()->json([
             'events' => $events,
-            'message' => 'Events retrieved successfully'
+            'message' => 'events retrieved successfully'
         ]);
     }
 
+    // atgriež vienu pasākumu pēc id ar detalizētu informāciju
     public function show($id)
     {
         $event = Event::with('style')->findOrFail($id);
-        
+
+        // sagatavo detalizētu atbildi, lai frontends varētu rādīt pilnu informāciju
         return response()->json([
             'event' => [
                 'id' => $event->event_id,
@@ -38,6 +56,7 @@ class EventController extends Controller
         ]);
     }
 
+    // izveido jaunu pasākumu pēc validācijas
     public function store(Request $request)
     {
         $request->validate([
@@ -50,11 +69,12 @@ class EventController extends Controller
             'capacity' => 'required|integer|min:1|max:50',
         ]);
 
+        // saglabā jauno ierakstu tieši no saņemtajiem datiem
         $event = Event::create($request->all());
 
         return response()->json([
             'event' => $event,
-            'message' => 'Event created successfully'
+            'message' => 'event created successfully'
         ], 201);
     }
 }

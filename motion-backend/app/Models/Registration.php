@@ -9,6 +9,7 @@ class Registration extends Model
 {
     use HasFactory;
 
+    protected $table = 'registrations';
     protected $primaryKey = 'registration_id';
 
     protected $fillable = [
@@ -20,4 +21,16 @@ class Registration extends Model
     protected $casts = [
         'registration_date' => 'date'
     ];
+
+    public $timestamps = false;
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class, 'event_id', 'event_id');
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id', 'client_id');
+    }
 }

@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Client;
@@ -10,7 +12,7 @@ use App\Models\Group;
 
 class AdminController extends Controller
 {
-    // Get admin dashboard stats
+    // atgriež galvenos administrācijas paneļa skaitļus un pēdējos piecus lietotājus
     public function dashboard()
     {
         $stats = [
@@ -24,20 +26,22 @@ class AdminController extends Controller
 
         return response()->json([
             'stats' => $stats,
-            'message' => 'Dashboard data retrieved successfully'
+            'message' => 'dashboard data retrieved successfully'
         ]);
     }
 
-    // Get admin profile
+    // atgriež autorizētā admina profila informāciju
     public function getProfile(Request $request)
     {
         $user = $request->user();
         $admin = $user->admin;
 
+        // ja admina profils nav izveidots, atgriežam 404 kļūdu
         if (!$admin) {
-            return response()->json(['message' => 'Admin profile not found'], 404);
+            return response()->json(['message' => 'admin profile not found'], 404);
         }
 
+        // tiek atgriezti gan lietotāja, gan admina papildu profila lauki
         return response()->json([
             'admin' => [
                 'user' => $user,
@@ -45,23 +49,22 @@ class AdminController extends Controller
                 'bio_description' => $admin->bio_description,
                 'photo_url' => $admin->photo_url,
             ],
-            'message' => 'Admin profile retrieved successfully'
+            'message' => 'admin profile retrieved successfully'
         ]);
     }
-    
 
-    // Get all groups
+    // ielādē visas grupas izmantošanai administrācijas saskarnē
     public function getGroups()
     {
         $groups = Group::all();
-        
+
         return response()->json([
             'groups' => $groups,
-            'message' => 'Groups retrieved successfully'
+            'message' => 'groups retrieved successfully'
         ]);
     }
 
-    // Create new group
+    // izveido jaunu grupu, pārbaudot obligātos laukus un dalībnieku limitu
     public function createGroup(Request $request)
     {
         $request->validate([
@@ -77,18 +80,18 @@ class AdminController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Group created successfully',
+            'message' => 'group created successfully',
             'group' => $group
         ], 201);
     }
 
-    // Get all instructors for dropdown
+    // sagatavo instruktoru sarakstu nolaižamajai izvēlnei
     public function getInstructors()
     {
         $instructors = Admin::with('user')
             ->where('position_type', 'instructor')
             ->get()
-            ->map(function($admin) {
+            ->map(function ($admin) {
                 return [
                     'admin_id' => $admin->admin_id,
                     'name' => $admin->user->name . ' ' . $admin->user->surname,
@@ -100,10 +103,11 @@ class AdminController extends Controller
 
         return response()->json([
             'instructors' => $instructors,
-            'message' => 'Instructors retrieved successfully'
+            'message' => 'instructors retrieved successfully'
         ]);
     }
 
+    // dzēš grupu un apstrādā kļūdu, ja ieraksts neeksistē vai dzēšana neizdodas
     public function deleteGroup($id)
     {
         try {
@@ -111,36 +115,35 @@ class AdminController extends Controller
             $group->delete();
 
             return response()->json([
-                'message' => 'Group deleted successfully'
+                'message' => 'group deleted successfully'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Failed to delete group',
+                'message' => 'failed to delete group',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
+    // dzēš instruktoru pēc id, saglabājot vienādu kļūdu apstrādi
     public function deleteInstructor($id)
-{
-    try {
-        $instructor = Admin::findOrFail($id);
-        $instructor->delete();
+    {
+        try {
+            $instructor = Admin::findOrFail($id);
+            $instructor->delete();
 
-        return response()->json([
-            'message' => 'Instructor removed successfully'
-        ]);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Failed to remove instructor',
-            'error' => $e->getMessage()
-        ], 500);
+            return response()->json([
+                'message' => 'instructor removed successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'failed to remove instructor',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
-}
 
-    // Create new instructor
+    // izveido jaunu instruktoru kopā ar piesaistītu lietotāja kontu
     public function createInstructor(Request $request)
     {
         $request->validate([
@@ -148,12 +151,13 @@ class AdminController extends Controller
             'surname' => 'required|string|max:30|regex:/^[\p{L}\s\-\']+$/u',
             'email' => 'required|string|max:100|unique:users|regex:/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
             'password' => 'required|string|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/|confirmed',
-            'phone_number' => 'required|string|max:20', 
+            'phone_number' => 'required|string|max:20',
             'birth_date' => 'required|date|before:today',
             'bio_description' => 'nullable|string|max:1000',
             'photo_url' => 'nullable|url'
         ]);
 
+        // vispirms tiek izveidots lietotāja konts ar droši saglabātu paroli
         $user = User::create([
             'name' => $request->name,
             'surname' => $request->surname,
@@ -163,6 +167,7 @@ class AdminController extends Controller
             'birth_date' => $request->birth_date
         ]);
 
+        // pēc tam tiek izveidots admina ieraksts ar instrukтора lomu
         $instructor = Admin::create([
             'user_id' => $user->user_id,
             'position_type' => 'instructor',
@@ -170,9 +175,10 @@ class AdminController extends Controller
             'photo_url' => $request->photo_url
         ]);
 
+        // atgriežam izveidoto instruktoru kopā ar saistīto lietotāja profilu
         return response()->json([
-            'message' => 'Instructor created successfully',
+            'message' => 'instructor created successfully',
             'instructor' => $instructor->load('user')
         ], 201);
-        }
+    }
 }
